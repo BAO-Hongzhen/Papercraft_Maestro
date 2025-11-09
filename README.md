@@ -17,8 +17,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <h1 align="center">Keyboard Liberator</h1>
-  <h4>Liberate your keyboard in unexpected ways and achieve a novel and smooth gaming experience</h4>
+  <h1 align="center">Syntax Roulette</h1>
+  <h4>Syntax Roulette is a generative playground that fuses grammar structure with multimedia creation. Players randomly draw words for each syntactic role — subject, verb, object, modifier, etc. — to form a complete English sentence. That sentence becomes a prompt to generate a dynamic GIF, transforming linguistic randomness into visual storytelling.</h4>
   <br />
 </div>
 
