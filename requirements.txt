@@ -1,43 +1,10 @@
-# Syntax Roulette - Text-to-Image Generator
-# Python Requirements File
-# Compatible with Python 3.8+
+# Syntax Roulette 依赖包
 
-# ===== Core Dependencies =====
-# Gradio - Web interface framework
+# 核心依赖
 gradio>=4.0.0
-
-# PIL/Pillow - Image processing
 Pillow>=10.0.0
-
-# NumPy - Numerical operations
+requests>=2.31.0
 numpy>=1.24.0
 
-# ===== AI/ML Dependencies =====
-# PyTorch - Deep learning framework
-# Note: Visit https://pytorch.org for platform-specific installation instructions
-torch>=2.0.0
-torchvision>=0.15.0
-
-# Diffusers - Hugging Face diffusion models library
-diffusers>=0.21.0
-
-# Transformers - For text encoding in Stable Diffusion
-transformers>=4.30.0
-
-# Accelerate - For optimized model loading and inference
-accelerate>=0.20.0
-
-# Safetensors - Safe tensor serialization
-safetensors>=0.3.0
-
-# ===== Optional Performance Boosters =====
-# xformers - Memory efficient attention (CUDA only)
-# Uncomment if using NVIDIA GPU and want faster generation:
-# xformers>=0.0.20
-
-# ===== Utilities =====
-# Requests - HTTP library (for potential API calls)
-requests>=2.31.0
-
-# tqdm - Progress bars
-tqdm>=4.65.0
+# 可选依赖（如果需要WebSocket支持）
+websocket-client>=1.6.0

@@ -1,19 +1,12 @@
-# Python virtual environment
-venv/
-env/
-.venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-
-# Distribution / packaging
+env/
+venv/
+ENV/
 build/
 develop-eggs/
 dist/
@@ -30,12 +23,19 @@ wheels/
 .installed.cfg
 *.egg
 
-# PyTorch/Model cache
-.cache/
-huggingface/
+# Gradio
+gradio_cached_examples/
+flagged/
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# Output files
+output/*.gif
+output/*.png
+output/*.jpg
+!output/.gitkeep
+
+# Data files (optional, keep custom words)
+# data/*.json
+# !data/default_words.json
 
 # IDE
 .vscode/
@@ -44,43 +44,9 @@ huggingface/
 *.swo
 *~
 
-# macOS
+# OS
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Windows
 Thumbs.db
-ehthumbs.db
-Desktop.ini
 
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-
-# Translations
-*.mo
-*.pot
-
-# Environment variables
-.env
-.env.local
-
-# Generated images (optional - uncomment if you don't want to commit generated images)
-# generated_images/
-# history/
-
+# Logs
+*.log

@@ -1,0 +1,86 @@
+{
+  "subjects": [
+    "a cat",
+    "a dog",
+    "a girl",
+    "a boy",
+    "an artist",
+    "a scientist",
+    "a robot",
+    "a dragon",
+    "a fairy",
+    "a wizard"
+  ],
+  "verbs": [
+    "is running",
+    "is jumping",
+    "is dancing",
+    "is flying",
+    "is swimming",
+    "is painting",
+    "is singing",
+    "is reading",
+    "is playing",
+    "is sleeping"
+  ],
+  "objects": [
+    "a ball",
+    "a book",
+    "a flower",
+    "a star",
+    "a rainbow",
+    "a sword",
+    "a guitar",
+    "a painting",
+    "a castle",
+    "a spaceship"
+  ],
+  "adjectives": [
+    "beautiful",
+    "magical",
+    "colorful",
+    "mysterious",
+    "ancient",
+    "glowing",
+    "floating",
+    "sparkling",
+    "peaceful",
+    "energetic"
+  ],
+  "adverbs": [
+    "happily",
+    "slowly",
+    "quickly",
+    "gracefully",
+    "carefully",
+    "mysteriously",
+    "peacefully",
+    "energetically",
+    "gently",
+    "wildly"
+  ],
+  "places": [
+    "in the forest",
+    "on the beach",
+    "in the city",
+    "in the mountains",
+    "in space",
+    "in a garden",
+    "under the stars",
+    "by the river",
+    "in a castle",
+    "on a cloud"
+  ],
+  "times": [
+    "at sunset",
+    "at dawn",
+    "at midnight",
+    "in the morning",
+    "in the evening",
+    "during spring",
+    "in winter",
+    "on a rainy day",
+    "on a sunny day",
+    "under the moonlight"
+  ]
+}
