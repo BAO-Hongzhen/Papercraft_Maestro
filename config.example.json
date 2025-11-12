@@ -1,9 +1,0 @@
-{
-  "comfyui_server": "127.0.0.1:8188",
-  "comment": "如果 ComfyUI 在其他主机，修改为对应的 IP 地址，例如: 192.168.1.200:8188",
-  "output_dir": "output",
-  "default_width": 512,
-  "default_height": 512,
-  "default_num_frames": 16,
-  "default_fps": 8
-}

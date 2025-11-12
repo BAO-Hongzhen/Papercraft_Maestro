@@ -19,34 +19,16 @@ import os
 class ComfyUIClient:
     """ComfyUI API客户端"""
     
-    def __init__(self, server_address: str = None):
+    def __init__(self, server_address: str = "127.0.0.1:8188"):
         """
         初始化ComfyUI客户端
         
         Args:
-            server_address: ComfyUI服务器地址，如果为None则尝试从配置文件读取
+            server_address: ComfyUI服务器地址
         """
-        # 如果没有指定地址，尝试从配置文件读取
-        if server_address is None:
-            server_address = self._load_server_address_from_config()
-        
         self.server_address = server_address
         self.client_id = str(uuid.uuid4())
         self.base_url = f"http://{server_address}"
-    
-    def _load_server_address_from_config(self) -> str:
-        """从配置文件加载服务器地址"""
-        try:
-            # 尝试读取 config.json
-            if os.path.exists("config.json"):
-                with open("config.json", "r", encoding="utf-8") as f:
-                    config = json.load(f)
-                    return config.get("comfyui_server", "127.0.0.1:8188")
-        except Exception:
-            pass
-        
-        # 默认值
-        return "127.0.0.1:8188"
     
     def queue_prompt(self, prompt: Dict) -> Optional[str]:
         """
