@@ -11,7 +11,7 @@ echo "========================================================================"
 echo ""
 
 # Check if virtual environment exists
-if [ ! -d "venv" ]; then
+if [ ! -d ".venv" ]; then
     echo "[ERROR] Virtual environment not found!"
     echo ""
     echo "Please run './setup_macos.sh' first to set up the environment."
@@ -21,7 +21,7 @@ fi
 
 # Activate virtual environment
 echo "[1/2] Activating virtual environment..."
-source venv/bin/activate
+source .venv/bin/activate
 if [ $? -ne 0 ]; then
     echo "[ERROR] Failed to activate virtual environment!"
     echo "Please run './setup_macos.sh' again."

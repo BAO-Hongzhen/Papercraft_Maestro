@@ -9,6 +9,11 @@
 
 Shuffle card decks, pick words from 5 syntax categories, generate creative sentences, and watch as AI transforms them into stunning images using Stable Diffusion.
 
+> 📚 **Documentation Guide:**  
+> - 🆕 **New to programming?** Start with [BEGINNER_GUIDE.md](BEGINNER_GUIDE.md)  
+> - ⚡ **Just need commands?** See [QUICK_START.md](QUICK_START.md)  
+> - 📖 **Want details?** Keep reading this file!
+
 ---
 
 ## 📸 What Does It Do?
@@ -206,7 +211,7 @@ Syntax_Roulette/
 │
 ├── 📄 README.md                    # This file
 ├── 📄 QUICK_START.md              # Quick reference guide
-├── 📄 DOCUMENTATION_SUMMARY.md    # Technical documentation
+├── 📄 BEGINNER_GUIDE.md           # Beginner's installation guide
 │
 ├── 🐍 main.py                     # Main application
 ├── 🐍 word_banks.py              # Word categories (150 words)
@@ -221,7 +226,7 @@ Syntax_Roulette/
 ├── 🍎 run_macos.sh               # macOS/Linux run script
 │
 ├── 📁 output/                     # Generated images (auto-created)
-├── 📁 venv/                       # Virtual environment (auto-created)
+├── 📁 .venv/                      # Virtual environment (auto-created)
 └── 📁 .git/                       # Git repository files
 ```
 

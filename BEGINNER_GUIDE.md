@@ -250,7 +250,7 @@ run_windows.bat
 
 **Solution**:
 ```bash
-# Delete the venv folder if it exists
+# Delete the .venv folder if it exists
 # Then run setup again:
 setup_windows.bat    # Windows
 ./setup_macos.sh     # macOS/Linux

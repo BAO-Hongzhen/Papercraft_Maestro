@@ -11,7 +11,7 @@ echo ========================================================================
 echo.
 
 REM Check if virtual environment exists
-if not exist venv (
+if not exist .venv (
     echo [ERROR] Virtual environment not found!
     echo.
     echo Please run "setup_windows.bat" first to set up the environment.
@@ -22,7 +22,7 @@ if not exist venv (
 
 REM Activate virtual environment
 echo [1/2] Activating virtual environment...
-call venv\Scripts\activate.bat
+call .venv\Scripts\activate.bat
 if errorlevel 1 (
     echo [ERROR] Failed to activate virtual environment!
     echo Please run "setup_windows.bat" again.

@@ -44,12 +44,12 @@ fi
 echo ""
 
 echo "[3/6] Creating virtual environment..."
-if [ -d "venv" ]; then
+if [ -d ".venv" ]; then
     echo "Virtual environment already exists. Removing old one..."
-    rm -rf venv
+    rm -rf .venv
 fi
 
-python3 -m venv venv
+python3 -m venv .venv
 if [ $? -ne 0 ]; then
     echo "[ERROR] Failed to create virtual environment!"
     echo ""
@@ -59,7 +59,7 @@ echo "Virtual environment created successfully!"
 echo ""
 
 echo "[4/6] Activating virtual environment..."
-source venv/bin/activate
+source .venv/bin/activate
 if [ $? -ne 0 ]; then
     echo "[ERROR] Failed to activate virtual environment!"
     echo ""

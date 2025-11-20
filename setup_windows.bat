@@ -39,12 +39,12 @@ if errorlevel 1 (
 )
 
 echo [2/5] Creating virtual environment...
-if exist venv (
+if exist .venv (
     echo Virtual environment already exists. Removing old one...
-    rmdir /s /q venv
+    rmdir /s /q .venv
 )
 
-python -m venv venv
+python -m venv .venv
 if errorlevel 1 (
     echo [ERROR] Failed to create virtual environment!
     echo.
@@ -55,7 +55,7 @@ echo Virtual environment created successfully!
 echo.
 
 echo [3/5] Activating virtual environment...
-call venv\Scripts\activate.bat
+call .venv\Scripts\activate.bat
 if errorlevel 1 (
     echo [ERROR] Failed to activate virtual environment!
     echo.
