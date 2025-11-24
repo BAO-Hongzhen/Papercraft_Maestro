@@ -16,8 +16,16 @@ instance/
 .webassets-cache
 
 # 生成的文件
-output/
-uploads/
+# 忽略文件夹中的图片，但保留文件夹结构
+output/*.png
+output/*.jpg
+output/*.jpeg
+output/*.gif
+image_generated/*.png
+image_generated/*.jpg
+image_generated/*.jpeg
+image_generated/*.gif
+uploads/*
 downloads/
 
 # IDE

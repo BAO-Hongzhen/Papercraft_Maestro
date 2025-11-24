@@ -42,7 +42,7 @@
     },
     "31": {
       "inputs": {
-        "seed": 992172,
+        "seed": 992577,
         "steps": 30,
         "cfg": 1.0,
         "sampler_name": "euler",
@@ -103,8 +103,8 @@
     },
     "41": {
       "inputs": {
-        "clip_l": "A vibrant red Chinese paper-cutting art style, traditional folk art, intricate silhouette design, symmetrical pattern, a boy is playing a ball, complex Chinese patterns, stand proudly among the swirling clouds and stylized clouds, pure white background, bold traditional design, high quality, detailed",
-        "t5xxl": "A vibrant red Chinese paper-cutting art style, traditional folk art, intricate silhouette design, symmetrical pattern, a boy is playing a ball, complex Chinese patterns, stand proudly among the swirling clouds and stylized clouds, pure white background, bold traditional design, high quality, detailed",
+        "clip_l": "A vibrant red Chinese paper-cutting art style, traditional folk art, intricate silhouette design, symmetrical pattern, a turtle, complex Chinese patterns, stand proudly among the swirling clouds and stylized clouds, pure white background, bold traditional design, high quality, detailed",
+        "t5xxl": "A vibrant red Chinese paper-cutting art style, traditional folk art, intricate silhouette design, symmetrical pattern, a turtle, complex Chinese patterns, stand proudly among the swirling clouds and stylized clouds, pure white background, bold traditional design, high quality, detailed",
         "guidance": 3.5,
         "clip": [
           "45",
@@ -148,5 +148,5 @@
       }
     }
   },
-  "client_id": "6f417cb0-42a8-4ab0-b66c-11fc1e2b96a8"
+  "client_id": "9d8f473f-5b27-4b88-b4d2-741a532556b5"
 }
