@@ -1,0 +1,712 @@
+/**
+ * 剪纸大师 (Papercraft Maestro) - 前端样式
+ * 完全自定义的 CSS，精确还原 Figma 设计
+ */
+
+/* ========== 全局重置 ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: #000;
+    overflow-x: hidden;
+}
+
+.page-container {
+    width: 100%;
+    min-height: 100vh;
+    display: none;
+}
+
+.page-container.active {
+    display: block;
+}
+
+/* ========== UI_1 主界面样式 ========== */
+
+#ui-page-1 {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Banner 区域 */
+.banner-section {
+    position: relative;
+    width: 100%;
+    margin: 0;
+}
+
+.banner-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* 叠加容器 */
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+/* 中文标题 - 精确绝对定位 */
+.chinese-title {
+    position: absolute;
+    width: 22.43%;
+    height: auto;
+    left: 49.918981%;
+    top: 22.072072%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+}
+
+/* 英文标题 */
+.english-title {
+    position: absolute;
+    width: 23.54%;
+    height: auto;
+    left: 48.4375%;
+    top: 12.891463%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+}
+
+/* Slogan */
+.slogan {
+    position: absolute;
+    width: 42.06%;
+    height: auto;
+    left: 50.104167%;
+    top: 36.615187%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+}
+
+/* Search Bar - 绝对定位 */
+.searchbar-absolute {
+    position: absolute;
+    left: 50%;
+    top: 46.074646%;
+    transform: translate(-50%, -50%);
+    width: 43.70%;
+    z-index: 25;
+}
+
+.search-bar-bg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* 输入框叠加层 */
+.input-overlay-direct {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 70%;
+    z-index: 50;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+}
+
+/* 直接输入框样式 */
+#prompt-input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0 30px;
+    font-size: 15px;
+    color: #ffffff;
+    caret-color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+#prompt-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 1;
+}
+
+#prompt-input:focus {
+    outline: none;
+}
+
+/* 隐藏浏览器自动填充/历史记录下拉框 */
+#prompt-input::-webkit-contacts-auto-fill-button,
+#prompt-input::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+    height: 0;
+    width: 0;
+    margin: 0;
+}
+
+/* 移除自动填充背景色 */
+#prompt-input:-webkit-autofill,
+#prompt-input:-webkit-autofill:hover,
+#prompt-input:-webkit-autofill:focus,
+#prompt-input:-webkit-autofill:active {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #ffffff;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: inset 0 0 20px 20px transparent;
+}
+
+/* Generate Button - 绝对定位 */
+.generate-absolute {
+    position: absolute;
+    left: 66.93287%;
+    top: 47.0399%;
+    transform: translate(-50%, -50%);
+    width: 8.68%;
+    z-index: 30;
+}
+
+.generate-btn-custom {
+    display: block;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    height: auto;
+}
+
+.generate-btn-custom:hover {
+    transform: scale(1.08);
+    filter: brightness(1.15) drop-shadow(0 6px 20px rgba(211, 47, 47, 0.4));
+}
+
+.generate-btn-custom img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ========== UI_2 结果界面样式 ========== */
+
+#result-papercut-ui {
+    position: relative;
+    width: 100%;
+    max-width: 1440px;
+    min-height: 777px;
+    margin: 0 auto;
+    padding: 0;
+    background: linear-gradient(270deg, #6E0000 0%, #A50000 100%);
+}
+
+/* Slogan 标语 */
+.result-slogan {
+    position: absolute;
+    width: 436px;
+    height: 16px;
+    left: calc(50% - 436px/2 - 435px);
+    top: 457px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: 0.1em;
+    color: #FFF5F5;
+}
+
+/* Logo 区域 */
+.result-logo {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    left: 67px;
+    top: 179px;
+}
+
+/* Logo 外边框 */
+.logo-outer-border {
+    box-sizing: border-box;
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    left: 0;
+    top: 0;
+    background: #6E0000;
+    border: 3.2px solid #6E0000;
+    border-radius: 6px;
+}
+
+/* Logo 内边框 */
+.logo-inner-border {
+    box-sizing: border-box;
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    left: 4.9px;
+    top: 5px;
+    background: #6E0000;
+    border: 1px solid #F9FAFC;
+    border-radius: 6px;
+}
+
+/* Logo 文字 */
+.logo-text-da, .logo-text-shi, .logo-text-jian, .logo-text-zhi {
+    position: absolute;
+    width: 28px;
+    height: 34px;
+    font-family: 'Slidefu', 'STKaiti', 'KaiTi', serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 34px;
+    color: #F9FAFC;
+}
+
+.logo-text-da { left: 11px; top: 10px; }
+.logo-text-shi { left: 11px; top: 36px; }
+.logo-text-jian { left: 38px; top: 10px; letter-spacing: 0.01em; }
+.logo-text-zhi { left: 38px; top: 36px; letter-spacing: 0.01em; }
+
+/* 标题组 */
+.result-title-group {
+    position: absolute;
+    width: 402px;
+    height: 162px;
+    left: 67px;
+    top: 259px;
+}
+
+/* PAPER 标题 */
+.result-title-tj {
+    position: absolute;
+    width: 402px;
+    height: 86px;
+    left: 0;
+    top: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 70.9565px;
+    line-height: 86px;
+    letter-spacing: 0.05em;
+    color: #FFF8F8;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* MAESTRO 标题（渐变色）*/
+.result-title-navigator {
+    position: absolute;
+    width: 275px;
+    height: 76px;
+    left: 0;
+    top: 86px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 800;
+    font-size: 62.4417px;
+    line-height: 76px;
+    letter-spacing: 0.05em;
+    background: linear-gradient(180deg, #FFFFFF 29.33%, #FF8C00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* 剪纸图片展示区域 */
+.result-image-container {
+    position: absolute;
+    width: 640px;
+    height: 640px;
+    left: 676px;
+    top: 75px;
+    border-radius: 22.1173px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+#result-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+}
+
+#result-image.loaded {
+    display: block;
+}
+
+/* 加载覆盖层 */
+#loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(110, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+#loading-overlay.hidden {
+    display: none;
+}
+
+/* 加载动画 */
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #FFF;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+#loading-message {
+    margin-top: 20px;
+    color: #FFF;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+#loading-steps {
+    margin-top: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    text-align: center;
+    max-width: 80%;
+}
+
+/* 功能按钮容器 */
+.result-action-buttons {
+    position: absolute;
+    left: 63px;
+    top: 672px;
+    display: flex;
+    gap: 21px;
+    align-items: center;
+}
+
+/* 通用按钮样式 */
+.result-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #6E0000;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 19px;
+    letter-spacing: 0.1em;
+    color: #FFFFFF;
+}
+
+.result-action-btn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+}
+
+/* Try Again 按钮 */
+.try-again-btn {
+    width: 164px;
+    height: 43px;
+}
+
+/* Render in Scene 按钮 */
+.render-scene-btn {
+    width: 177px;
+    height: 43px;
+}
+
+/* Download 按钮 (小) */
+.download-btn-small {
+    width: 98.56px;
+    height: 25.6px;
+    position: absolute;
+    left: 1138px;
+    top: -4px;
+    border-radius: 42.24px;
+    font-size: 10.24px;
+    line-height: 12px;
+    padding: 0 8px;
+}
+
+.download-btn-small svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ========== UI_3 场景渲染界面样式 ========== */
+
+#scene-render-ui {
+    position: relative;
+    width: 1440px;
+    height: 777px;
+    overflow-y: scroll;
+    background: linear-gradient(90deg, #A50000 0%, #6E0000 100%);
+    margin: 0 auto;
+}
+
+/* 场景页面 Slogan */
+.scene-slogan {
+    position: absolute;
+    width: 218px;
+    height: 32px;
+    left: calc(50% - 218px/2 - 556px);
+    top: 463px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: 0.1em;
+    color: #FFF5F5;
+}
+
+/* 场景页面 Logo */
+.scene-logo {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    left: 53px;
+    top: 257px;
+}
+
+.scene-logo .logo-outer-border {
+    left: 0;
+    top: 0;
+}
+
+.scene-logo .logo-inner-border {
+    left: 4.9px;
+    top: 5px;
+}
+
+.scene-logo .logo-text-da { left: 11px; top: 10px; }
+.scene-logo .logo-text-shi { left: 11px; top: 36px; }
+.scene-logo .logo-text-jian { left: 38px; top: 10px; }
+.scene-logo .logo-text-zhi { left: 38px; top: 36px; }
+
+/* 场景页面标题组 */
+.scene-title-group {
+    position: absolute;
+    width: 201px;
+    height: 81px;
+    left: 56px;
+    top: 352px;
+}
+
+/* PAPER 标题（场景页面） */
+.scene-title-tj {
+    position: absolute;
+    width: 201px;
+    height: 43px;
+    left: 0;
+    top: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 35.4783px;
+    line-height: 43px;
+    letter-spacing: 0.05em;
+    color: #FFF8F8;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* MAESTRO 标题（场景页面） */
+.scene-title-navigator {
+    position: absolute;
+    width: 138px;
+    height: 38px;
+    left: 0;
+    top: 43px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-style: normal;
+    font-weight: 800;
+    font-size: 31.2209px;
+    line-height: 38px;
+    letter-spacing: 0.05em;
+    background: linear-gradient(180deg, #FFFFFF 29.33%, #FF8C00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* 场景容器 */
+.scene-container {
+    position: absolute;
+    width: 1089px;
+    height: 430px;
+    left: 351px;
+    top: 202px;
+    background: #6E0000;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 55px 30px;
+    box-sizing: border-box;
+}
+
+/* 场景项 */
+.scene-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* 场景预览区域 */
+.scene-preview {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    border-radius: 11.0587px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.scene-preview:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* 场景背景图片 */
+.scene-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 剪纸叠加层 */
+.papercut-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    z-index: 2;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+/* 场景下载按钮 */
+.scene-download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 98.56px;
+    height: 25.6px;
+    background: #6E0000;
+    border: 1px solid #F9FAFC;
+    border-radius: 42.24px;
+    color: #F9FAFC;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 10.24px;
+    font-weight: 500;
+    line-height: 12px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.scene-download-btn:hover {
+    background: #8B0000;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(249, 250, 252, 0.3);
+}
+
+.scene-download-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.scene-download-btn span {
+    font-size: 10.24px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1440px) {
+    #scene-render-ui {
+        width: 100%;
+    }
+    
+    .scene-container {
+        width: 90%;
+        left: 5%;
+    }
+}
+
+@media (max-width: 1024px) {
+    .scene-container {
+        flex-direction: column;
+        height: auto;
+        padding: 30px 20px;
+    }
+    
+    .scene-item {
+        margin-bottom: 20px;
+    }
+}
+
+/* ========== 响应式设计 ========== */
+@media (max-width: 1400px) {
+    .chinese-title { width: 26%; }
+    .english-title { width: 27%; }
+    .slogan { width: 48%; }
+    .searchbar-absolute { width: 50%; }
+}
+
+@media (max-width: 1024px) {
+    .chinese-title { width: 32%; }
+    .english-title { width: 33%; }
+    .slogan { width: 55%; }
+    .searchbar-absolute { width: 60%; }
+}
+
+@media (max-width: 768px) {
+    .chinese-title { width: 45%; }
+    .english-title { width: 46%; }
+    .slogan { width: 70%; }
+    .searchbar-absolute { width: 75%; }
+}

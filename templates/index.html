@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剪纸大师 - Papercraft Maestro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- UI_1 主界面 -->
+    <div id="ui-page-1" class="page-container active">
+        <!-- Banner 背景区域 -->
+        <div class="banner-section">
+            <img src="{{ url_for('static', filename='images/Banner.png') }}" class="banner-img" alt="Banner">
+            
+            <!-- 所有元素叠加层（绝对定位） -->
+            <div class="overlay-container">
+                <!-- 中文标题 -->
+                <img src="{{ url_for('static', filename='images/Chinese Title.png') }}" class="chinese-title" alt="剪纸大师">
+                
+                <!-- 英文标题 -->
+                <img src="{{ url_for('static', filename='images/English Title.png') }}" class="english-title" alt="Papercraft Maestro">
+                
+                <!-- Slogan -->
+                <img src="{{ url_for('static', filename='images/slogan.png') }}" class="slogan" alt="Slogan">
+
+                <!-- Search Bar - 精确位置 -->
+                <div class="searchbar-absolute">
+                    <img src="{{ url_for('static', filename='images/Search Bar.png') }}" class="search-bar-bg" alt="Search Bar">
+                    <!-- 输入框叠加层 -->
+                    <div class="input-overlay-direct">
+                        <input type="text" 
+                               id="prompt-input" 
+                               placeholder="Describe what you want to see..." 
+                               autocomplete="off" 
+                               autocorrect="off" 
+                               autocapitalize="off" 
+                               spellcheck="false" />
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="generate-absolute">
+                    <button class="generate-btn-custom" id="generate-btn" type="button">
+                        <img src="{{ url_for('static', filename='images/Generate Butten.png') }}" alt="Generate">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI_2 结果界面（初始隐藏） -->
+    <div id="ui-page-2" class="page-container" style="display: none;">
+        <div id="result-papercut-ui">
+            <!-- Slogan 标语 -->
+            <div class="result-slogan">Where imagination meets tradition, with a playful cut</div>
+            
+            <!-- Logo 区域 -->
+            <div class="result-logo">
+                <div class="logo-outer-border"></div>
+                <div class="logo-inner-border"></div>
+                <div class="logo-text-da">大</div>
+                <div class="logo-text-shi">师</div>
+                <div class="logo-text-jian">剪</div>
+                <div class="logo-text-zhi">纸</div>
+            </div>
+            
+            <!-- 标题组 -->
+            <div class="result-title-group">
+                <div class="result-title-tj">PAPER</div>
+                <div class="result-title-navigator">MAESTRO</div>
+            </div>
+            
+            <!-- 剪纸图片展示区域 -->
+            <div class="result-image-container">
+                <img id="result-image" src="" alt="生成的剪纸作品" />
+                <div id="loading-overlay">
+                    <div class="loading-spinner"></div>
+                    <div id="loading-message">正在生成剪纸图案...</div>
+                    <div id="loading-steps"></div>
+                </div>
+            </div>
+            
+            <!-- 三个功能按钮 -->
+            <div class="result-action-buttons">
+                <!-- Try Again Button -->
+                <button class="result-action-btn try-again-btn" id="try-again-btn">
+                    <span>Try Again</span>
+                </button>
+                
+                <!-- Render in Scene Button -->
+                <button class="result-action-btn render-scene-btn" id="render-scene-btn">
+                    <span>Render in Scene</span>
+                </button>
+                
+                <!-- Download Button -->
+                <button class="result-action-btn download-btn-small" id="download-btn">
+                    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 3V19M13 19L7 13M13 19L19 13M3 23H23" stroke="#F9FAFC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Download</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI_3 场景渲染界面（初始隐藏） -->
+    <div id="ui-page-3" class="page-container" style="display: none;">
+        <div id="scene-render-ui">
+            <!-- Slogan 标语 -->
+            <div class="scene-slogan">Where imagination meets tradition, with a playful cut</div>
+            
+            <!-- Logo 区域 -->
+            <div class="scene-logo">
+                <div class="logo-outer-border"></div>
+                <div class="logo-inner-border"></div>
+                <div class="logo-text-da">大</div>
+                <div class="logo-text-shi">师</div>
+                <div class="logo-text-jian">剪</div>
+                <div class="logo-text-zhi">纸</div>
+            </div>
+            
+            <!-- 标题组 -->
+            <div class="scene-title-group">
+                <div class="scene-title-tj">PAPER</div>
+                <div class="scene-title-navigator">MAESTRO</div>
+            </div>
+            
+            <!-- 场景选择容器 -->
+            <div class="scene-container">
+                <!-- Door 场景 -->
+                <div class="scene-item" data-scene="door">
+                    <div class="scene-preview" id="scene-preview-door">
+                        <img src="{{ url_for('static', filename='images/Door.jpg') }}" alt="Door Scene" class="scene-bg">
+                        <img id="papercut-overlay-door" src="" alt="Papercut" class="papercut-overlay" style="display:none;">
+                    </div>
+                    <button class="scene-download-btn" data-scene="door">
+                        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 3V19M13 19L7 13M13 19L19 13M3 23H23" stroke="#F9FAFC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Download</span>
+                    </button>
+                </div>
+                
+                <!-- Wall 场景 -->
+                <div class="scene-item" data-scene="wall">
+                    <div class="scene-preview" id="scene-preview-wall">
+                        <img src="{{ url_for('static', filename='images/Wall.jpg') }}" alt="Wall Scene" class="scene-bg">
+                        <img id="papercut-overlay-wall" src="" alt="Papercut" class="papercut-overlay" style="display:none;">
+                    </div>
+                    <button class="scene-download-btn" data-scene="wall">
+                        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 3V19M13 19L7 13M13 19L19 13M3 23H23" stroke="#F9FAFC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Download</span>
+                    </button>
+                </div>
+                
+                <!-- Window 场景 -->
+                <div class="scene-item" data-scene="window">
+                    <div class="scene-preview" id="scene-preview-window">
+                        <img src="{{ url_for('static', filename='images/Window.jpg') }}" alt="Window Scene" class="scene-bg">
+                        <img id="papercut-overlay-window" src="" alt="Papercut" class="papercut-overlay" style="display:none;">
+                    </div>
+                    <button class="scene-download-btn" data-scene="window">
+                        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 3V19M13 19L7 13M13 19L19 13M3 23H23" stroke="#F9FAFC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Download</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入 JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

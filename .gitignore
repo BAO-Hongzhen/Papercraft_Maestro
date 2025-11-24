@@ -4,76 +4,31 @@ __pycache__/
 *$py.class
 *.so
 .Python
-*.egg
-*.egg-info/
-dist/
-build/
-*.whl
 
 # Virtual Environment
 .venv/
 venv/
 ENV/
 env/
-.virtualenv/
 
-# IDEs
+# Flask
+instance/
+.webassets-cache
+
+# 生成的文件
+output/
+uploads/
+downloads/
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# macOS
 .DS_Store
 
-# Jupyter Notebook
-.ipynb_checkpoints/
-*.ipynb
-
-# OS Files
-.DS_Store
-Thumbs.db
-Desktop.ini
-
-# Gradio cache and temp files
-gradio_cached_examples/
-flagged/
-
-# Output files
-output/
-*.png
-*.jpg
-*.jpeg
-!Assets/**/*.png
-!Assets/**/*.jpg
-!Assets/**/*.jpeg
-
-# Logs
+# 日志
 *.log
-logs/
-
-# Temporary files
-tmp/
-temp/
-*.tmp
-
-# Test files (if any)
-test_*.py
-*_test.py
-
-# Documentation build files
-docs/_build/
-site/
-
-# Model files (if large)
-*.ckpt
-*.safetensors
-*.pt
-*.pth
-*.bin
-
-# Environment variables
-.env
-.env.local
-
-# Previous work backup
-Previous_Work/

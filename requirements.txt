@@ -1,13 +1,12 @@
-# 剪纸大师 (Papercraft Maestro) - 项目依赖包
+# 剪纸大师 (Papercraft Maestro) - Python 依赖
 
-# 核心依赖
-gradio>=4.0.0
-Pillow>=10.0.0
-requests>=2.31.0
-numpy>=1.24.0
-
-# ComfyUI API 简化库
-comfy-api-simplified>=1.0.0
+# Flask Web 框架
+Flask==3.0.0
+Werkzeug==3.0.1
 
 # 图像处理
-opencv-python>=4.8.0
+Pillow==10.1.0
+
+# ComfyUI 相关（可选，用于真实 AI 生成）
+# requests==2.31.0
+# websocket-client==1.6.1
