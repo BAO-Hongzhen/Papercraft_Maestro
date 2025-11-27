@@ -27,9 +27,9 @@ pip install -r requirements_flask.txt
 
 - flux1-dev-fp8.safetensors
 
-下载链接：https://huggingface.co/Kijai/flux-fp8/blob/main/flux1-dev-fp8.safetensors
+   下载链接：https://huggingface.co/Kijai/flux-fp8/blob/main/flux1-dev-fp8.safetensors
 
-部署位置：ComfyUI所在位置/models/diffusion_models
+   部署位置：ComfyUI所在位置/models/diffusion_models
 
 - clip_l.safetensors
 
