@@ -23,8 +23,6 @@ pip install -r requirements_flask.txt
 ```
 ### 2. 配置ComfyUI
 
-```bash
-# 为工作流得以运行，您需要下载以下模型
 flux1-dev-fp8.safetensors
 下载链接：https://huggingface.co/Kijai/flux-fp8/blob/main/flux1-dev-fp8.safetensors
 部署位置：ComfyUI所在位置/models/diffusion_models
