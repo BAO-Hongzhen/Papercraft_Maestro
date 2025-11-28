@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 # 导入剪纸生成模块
 try:
-    from ComfyUI_api import FluxComfyUI_Generator
+    from comfy_api import ComfyUIManager, find_comfyui_address
     from Image_Processing import desaturate_image, increase_contrast, remove_white_background, convert_to_red
     MODULES_AVAILABLE = True
 except ImportError:
@@ -36,15 +36,16 @@ os.makedirs(app.config['GENERATED_FOLDER'], exist_ok=True)
 os.makedirs(app.config['SCENE_FOLDER'], exist_ok=True)
 
 # 全局ComfyUI生成器实例（复用连接和工作流）
-_comfyui_client = None
+_comfyui_manager = None
+WORKFLOW_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ComfyUI_Workflow", "paper_cut.json")
 
-def get_comfyui_client():
+def get_comfyui_manager():
     """获取全局ComfyUI客户端实例（单例模式）"""
-    global _comfyui_client
-    if _comfyui_client is None and MODULES_AVAILABLE:
-        _comfyui_client = FluxComfyUI_Generator()
+    global _comfyui_manager
+    if _comfyui_manager is None and MODULES_AVAILABLE:
+        _comfyui_manager = ComfyUIManager(WORKFLOW_PATH)
         print("✅ 全局 ComfyUI 客户端已初始化")
-    return _comfyui_client
+    return _comfyui_manager
 
 
 @app.route('/')
@@ -149,60 +150,31 @@ def _generate_with_comfyui(prompt: str, scene_type: str, scene_image_path: str =
     try:
         # 获取全局 ComfyUI 客户端（复用实例）
         steps_info.append("🎨 连接 ComfyUI 服务...")
-        client = get_comfyui_client()
+        manager = get_comfyui_manager()
         
-        if client is None:
+        if manager is None:
             return {
                 'success': False,
                 'message': '❌ ComfyUI 模块未加载',
                 'steps': steps_info
             }
         
-        # 测试连接
-        if not client.test_connection():
-            return {
-                'success': False,
-                'message': '❌ ComfyUI 服务未连接！请确保 ComfyUI 正在运行于 http://127.0.0.1:8188',
-                'steps': steps_info
-            }
-        
         # 第1步：生成初始图像
         steps_info.append("⏳ 步骤 1/5: 调用 ComfyUI Flux 模型生成图像...")
-        first_part = "A vibrant red Chinese paper"
-        second_part = "complex Chinese patterns, stand proudly among the swirling clouds and stylized clouds. The background is pure white, emphasizing a bold traditional design"
         
-        result = client.generate_image(
-            first_part=first_part,
-            user_prompt=prompt,
-            second_part=second_part,
-            steps=30,
-            cfg=1.0,
-            width=1024,
-            height=1024
-        )
+        # 使用新的 ComfyUIManager 生成图片
+        # 注意：generate_image 已经包含了提示词拼接和随机种子设置
+        raw_image_path = manager.generate_image(prompt, app.config['GENERATED_FOLDER'])
         
-        if not result['success']:
+        if not raw_image_path:
             return {
                 'success': False,
-                'message': f"❌ 图像生成失败: {result.get('error', '未知错误')}",
+                'message': "❌ 图像生成失败: ComfyUI 未返回图片",
                 'steps': steps_info
             }
         
-        # 将ComfyUI生成的原始图片移动到 image_generated 文件夹
-        original_path = result['filename']
-        generated_image = Image.open(original_path)
-        
-        timestamp = int(time.time())
-        generated_filename = f"generated_{timestamp}.png"
-        generated_image_path = os.path.join(app.config['GENERATED_FOLDER'], generated_filename)
-        generated_image.save(generated_image_path)
-        
-        # 删除临时文件（如果需要）
-        if os.path.exists(original_path) and original_path != generated_image_path:
-            try:
-                os.remove(original_path)
-            except:
-                pass
+        generated_image = Image.open(raw_image_path)
+        generated_filename = os.path.basename(raw_image_path)
         
         # 第2步：去饱和
         steps_info.append("⏳ 步骤 2/5: 去饱和处理...")
@@ -221,6 +193,7 @@ def _generate_with_comfyui(prompt: str, scene_type: str, scene_image_path: str =
         processed_image = convert_to_red(processed_image)
         
         # 保存最终结果到 output 文件夹
+        timestamp = int(time.time())
         output_filename = f"papercut_{timestamp}.png"
         output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
         processed_image.save(output_path)
@@ -236,7 +209,7 @@ def _generate_with_comfyui(prompt: str, scene_type: str, scene_image_path: str =
             'scene_type': scene_type,
             'steps': steps_info,
             'processing_info': {
-                'comfyui_image': generated_image_path,
+                'comfyui_image': raw_image_path,
                 'final_output': output_path,
                 'steps_completed': 5
             }
@@ -576,10 +549,17 @@ def shutdown():
 def _check_comfyui_connection():
     """检查 ComfyUI 连接状态"""
     try:
-        client = get_comfyui_client()
-        if client is None:
-            return False
-        return client.test_connection()
+        # 如果 manager 已初始化，使用它的地址
+        if _comfyui_manager:
+            target_url = _comfyui_manager.server_address
+        else:
+            # 否则尝试检测
+            target_url = find_comfyui_address()
+            
+        # 验证连接
+        import requests
+        response = requests.get(f"{target_url}/system_stats", timeout=1)
+        return response.status_code == 200
     except:
         return False
 

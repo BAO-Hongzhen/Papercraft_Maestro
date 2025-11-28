@@ -2,6 +2,8 @@ import os
 import random
 import asyncio
 import time
+import socket
+import requests
 
 # 处理 asyncio 事件循环问题 (Streamlit 兼容性)
 try:
@@ -11,11 +13,54 @@ except RuntimeError:
 
 from comfy_api_simplified import ComfyApiWrapper, ComfyWorkflowWrapper
 
+def find_comfyui_address(start_port=8188, max_attempts=10):
+    """
+    自动检测 ComfyUI 地址
+    尝试连接本地常用端口
+    """
+    print("🔍 正在寻找 ComfyUI 服务...")
+    
+    # 1. 优先检查环境变量
+    env_addr = os.environ.get("COMFYUI_ADDRESS")
+    if env_addr:
+        print(f"✅ 从环境变量找到地址: {env_addr}")
+        return env_addr
+
+    # 2. 扫描本地端口
+    for port in range(start_port, start_port + max_attempts):
+        try:
+            # 简单的 TCP 连接测试
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(0.5)
+            result = sock.connect_ex(('127.0.0.1', port))
+            sock.close()
+            
+            if result == 0:
+                # 进一步验证是否是 ComfyUI (检查 /system_stats 端点)
+                url = f"http://127.0.0.1:{port}"
+                try:
+                    response = requests.get(f"{url}/system_stats", timeout=1)
+                    if response.status_code == 200:
+                        print(f"✅ 发现 ComfyUI 服务于: {url}")
+                        return url
+                except:
+                    pass
+        except:
+            continue
+            
+    print("⚠️ 未找到运行中的 ComfyUI，将使用默认地址 http://127.0.0.1:8188/")
+    return "http://127.0.0.1:8188/"
+
 class ComfyUIManager:
-    def __init__(self, workflow_path, server_address="http://127.0.0.1:8188/"):
-        self.server_address = server_address
+    def __init__(self, workflow_path, server_address=None):
+        if server_address is None:
+            self.server_address = find_comfyui_address()
+        else:
+            self.server_address = server_address
+            
         self.workflow_path = workflow_path
-        self.api = ComfyApiWrapper(server_address)
+        print(f"🔌 连接到 ComfyUI: {self.server_address}")
+        self.api = ComfyApiWrapper(self.server_address)
         
     def generate_image(self, prompt, output_dir):
         """
