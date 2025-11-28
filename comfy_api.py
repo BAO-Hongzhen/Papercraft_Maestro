@@ -13,10 +13,10 @@ except RuntimeError:
 
 from comfy_api_simplified import ComfyApiWrapper, ComfyWorkflowWrapper
 
-def find_comfyui_address(start_port=8188, max_attempts=10):
+def find_comfyui_address():
     """
     自动检测 ComfyUI 地址
-    尝试连接本地常用端口
+    支持 ComfyUI Desktop、命令行版本及自定义端口配置
     """
     print("🔍 正在寻找 ComfyUI 服务...")
     
@@ -26,30 +26,53 @@ def find_comfyui_address(start_port=8188, max_attempts=10):
         print(f"✅ 从环境变量找到地址: {env_addr}")
         return env_addr
 
-    # 2. 扫描本地端口
-    for port in range(start_port, start_port + max_attempts):
-        try:
-            # 简单的 TCP 连接测试
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(0.5)
-            result = sock.connect_ex(('127.0.0.1', port))
-            sock.close()
-            
-            if result == 0:
-                # 进一步验证是否是 ComfyUI (检查 /system_stats 端点)
-                url = f"http://127.0.0.1:{port}"
-                try:
-                    response = requests.get(f"{url}/system_stats", timeout=1)
-                    if response.status_code == 200:
-                        print(f"✅ 发现 ComfyUI 服务于: {url}")
-                        return url
-                except:
-                    pass
-        except:
-            continue
+    # 2. 定义要扫描的端口列表（按优先级排序）
+    # - 8000: ComfyUI Desktop 默认端口
+    # - 8188-8199: ComfyUI 命令行版本常用端口范围
+    # - 3000, 3001: 某些配置可能使用的端口
+    # - 7860, 7861: Gradio 风格端口（某些整合包可能使用）
+    priority_ports = [8000, 8188, 8189, 8190, 8191, 8192, 8193, 8194, 8195, 8196, 8197, 8198, 8199]
+    additional_ports = [3000, 3001, 7860, 7861, 8080, 8081, 9000, 9001]
+    all_ports = priority_ports + additional_ports
+
+    # 3. 扫描端口
+    for port in all_ports:
+        if _check_comfyui_port(port):
+            url = f"http://127.0.0.1:{port}"
+            print(f"✅ 发现 ComfyUI 服务于: {url}")
+            return url
             
     print("⚠️ 未找到运行中的 ComfyUI，将使用默认地址 http://127.0.0.1:8188/")
+    print("💡 提示: 请确保 ComfyUI 或 ComfyUI Desktop 已启动")
     return "http://127.0.0.1:8188/"
+
+
+def _check_comfyui_port(port):
+    """
+    检查指定端口是否运行着 ComfyUI 服务
+    
+    Args:
+        port: 要检查的端口号
+        
+    Returns:
+        bool: 如果端口上运行着 ComfyUI 则返回 True
+    """
+    try:
+        # 先进行快速 TCP 连接测试
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(0.3)
+        result = sock.connect_ex(('127.0.0.1', port))
+        sock.close()
+        
+        if result != 0:
+            return False
+            
+        # TCP 连接成功，验证是否是 ComfyUI (检查 /system_stats 端点)
+        url = f"http://127.0.0.1:{port}"
+        response = requests.get(f"{url}/system_stats", timeout=1)
+        return response.status_code == 200
+    except:
+        return False
 
 class ComfyUIManager:
     def __init__(self, workflow_path, server_address=None):
