@@ -111,6 +111,50 @@ def process_image_for_papercut(image_path: str) -> str:
         return None
 
 
+def render_on_window(papercut_path: str, scene_path: str, output_path: str) -> bool:
+    """
+    渲染到窗户场景
+    """
+    try:
+        papercut = Image.open(papercut_path).convert('RGBA')
+        scene = Image.open(scene_path).convert('RGB')
+        
+        # 准备剪纸图片用于窗户场景合成
+        # 1. 调整尺寸为 1736x1736
+        papercut = papercut.resize((1736, 1736), Image.Resampling.LANCZOS)
+        # 2. 应用特定颜色 (#980015) 和透明度 (75%)
+        processed_papercut = convert_to_red(papercut, color=(152, 0, 21), opacity=0.75)
+        
+        # Window coordinates
+        x, y = 2890, 137
+        
+        scene_rgba = scene.convert('RGBA')
+        scene_rgba.paste(processed_papercut, (x, y), processed_papercut)
+        
+        final_image = scene_rgba.convert('RGB')
+        final_image.save(output_path)
+        return True
+    except Exception as e:
+        print(f"Error rendering on window: {e}")
+        return False
+
+
+def render_on_wall(papercut_path: str, scene_path: str, output_path: str) -> bool:
+    """
+    渲染到墙壁场景 (暂未实现)
+    """
+    print("Render on wall not implemented yet.")
+    return False
+
+
+def render_on_door(papercut_path: str, scene_path: str, output_path: str) -> bool:
+    """
+    渲染到门场景 (暂未实现)
+    """
+    print("Render on door not implemented yet.")
+    return False
+
+
 def main():
     # 读取图片
     input_path = 'examples/input/d411ec41e95fa45c38c5ab852495a5b1.png'

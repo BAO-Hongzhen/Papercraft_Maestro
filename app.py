@@ -16,7 +16,10 @@ from werkzeug.utils import secure_filename
 # 导入剪纸生成模块
 try:
     from comfy_api import ComfyUIManager, find_comfyui_address
-    from Image_Processing import desaturate_image, increase_contrast, remove_white_background, convert_to_red
+    from Image_Processing import (
+        desaturate_image, increase_contrast, remove_white_background, convert_to_red,
+        render_on_window, render_on_wall, render_on_door
+    )
     MODULES_AVAILABLE = True
 except ImportError:
     print("⚠️ ComfyUI 模块未找到，将使用占位符模式")
@@ -356,14 +359,42 @@ def render_scene():
                 'message': f'❌ 场景图片不存在: {scene_filename}'
             }), 404
         
+        # 准备输出路径
+        timestamp = int(time.time())
+        output_filename = f"scene_{scene_type}_{timestamp}.png"
+        output_path = os.path.join(app.config['SCENE_FOLDER'], output_filename)
+        
         # 合成图片
         print(f"🔧 开始合成图片...")
-        result = _composite_scene(papercut_path, scene_path, scene_type)
         
-        if result['success']:
-            return jsonify(result)
+        success = False
+        if scene_type == 'window':
+            success = render_on_window(papercut_path, scene_path, output_path)
+        elif scene_type == 'wall':
+            success = render_on_wall(papercut_path, scene_path, output_path)
+        elif scene_type == 'door':
+            success = render_on_door(papercut_path, scene_path, output_path)
         else:
-            return jsonify(result), 500
+            # 默认为 window
+            success = render_on_window(papercut_path, scene_path, output_path)
+        
+        if success:
+            print(f"✅ 场景合成成功")
+            print(f"💾 保存位置: {output_path}")
+            print(f"📊 文件大小: {os.path.getsize(output_path) / 1024:.1f} KB")
+            
+            return jsonify({
+                'success': True,
+                'message': '✅ 场景渲染成功！',
+                'scene_image_url': f'/scene/{output_filename}',
+                'scene_type': scene_type,
+                'output_path': output_path
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': '❌ 合成失败'
+            }), 500
             
     except Exception as e:
         import traceback
@@ -374,118 +405,6 @@ def render_scene():
             'message': f'❌ 场景渲染失败: {str(e)}',
             'error': error_detail
         }), 500
-
-
-def _apply_color_and_opacity(image: Image.Image, color: tuple = (152, 0, 21), opacity: float = 0.75) -> Image.Image:
-    """
-    应用指定颜色和透明度到图片
-    
-    Args:
-        image: 输入图片（RGBA）
-        color: RGB颜色元组，默认为(152, 0, 21) = #980015
-        opacity: 透明度，0.0-1.0，默认为0.75 (75%)
-    
-    Returns:
-        处理后的图片
-    """
-    import numpy as np
-    
-    if image.mode != 'RGBA':
-        image = image.convert('RGBA')
-    
-    img_array = np.array(image)
-    a = img_array[:, :, 3]
-    
-    # 将所有非透明像素设为指定颜色
-    non_transparent = a > 0
-    
-    img_array[:, :, 0] = np.where(non_transparent, color[0], 0)  # R
-    img_array[:, :, 1] = np.where(non_transparent, color[1], 0)  # G
-    img_array[:, :, 2] = np.where(non_transparent, color[2], 0)  # B
-    
-    # 调整透明度：将原alpha值乘以opacity
-    img_array[:, :, 3] = np.where(non_transparent, (a * opacity).astype(np.uint8), 0)
-    
-    return Image.fromarray(img_array, 'RGBA')
-
-
-def _composite_scene(papercut_path: str, scene_path: str, scene_type: str):
-    """
-    合成剪纸图片到场景背景上
-    
-    Args:
-        papercut_path: 剪纸图片路径
-        scene_path: 场景背景图片路径
-        scene_type: 场景类型
-    
-    Returns:
-        dict: 包含合成结果的字典
-    """
-    try:
-        # 加载图片
-        papercut = Image.open(papercut_path).convert('RGBA')
-        scene = Image.open(scene_path).convert('RGB')
-        
-        print(f"📐 原始剪纸尺寸: {papercut.size}")
-        print(f"📐 场景尺寸: {scene.size}")
-        
-        # 调整剪纸尺寸为1736x1736
-        print("🔄 调整剪纸尺寸到1736x1736...")
-        papercut = papercut.resize((1736, 1736), Image.Resampling.LANCZOS)
-        
-        # 应用颜色和透明度处理：#980015, 75%透明度
-        print("🎨 应用颜色(#980015)和透明度(75%)...")
-        papercut = _apply_color_and_opacity(papercut, color=(152, 0, 21), opacity=0.75)
-        
-        print(f"📐 处理后剪纸尺寸: {papercut.size}")
-        
-        # 设置位置到右上部分
-        x = 2890
-        y = 137
-        
-        print(f"📍 放置位置: ({x}, {y})")
-        print(f"📐 场景尺寸: {scene.size}")
-        
-        # 将场景转换为RGBA以支持透明度合成
-        scene_rgba = scene.convert('RGBA')
-        
-        # 创建新图层用于合成
-        composite = Image.new('RGBA', scene_rgba.size, (255, 255, 255, 0))
-        composite.paste(scene_rgba, (0, 0))
-        
-        # 将剪纸粘贴到场景上（使用alpha通道）
-        composite.paste(papercut, (x, y), papercut)
-        
-        # 转换回RGB保存
-        final_image = composite.convert('RGB')
-        
-        # 保存合成图片
-        timestamp = int(time.time())
-        output_filename = f"scene_{scene_type}_{timestamp}.png"
-        output_path = os.path.join(app.config['SCENE_FOLDER'], output_filename)
-        final_image.save(output_path, 'PNG')
-        
-        print(f"✅ 场景合成成功")
-        print(f"💾 保存位置: {output_path}")
-        print(f"📊 文件大小: {os.path.getsize(output_path) / 1024:.1f} KB")
-        
-        return {
-            'success': True,
-            'message': '✅ 场景渲染成功！',
-            'scene_image_url': f'/scene/{output_filename}',
-            'scene_type': scene_type,
-            'output_path': output_path
-        }
-        
-    except Exception as e:
-        import traceback
-        error_detail = traceback.format_exc()
-        print(f"❌ 合成失败: {error_detail}")
-        return {
-            'success': False,
-            'message': f'❌ 合成失败: {str(e)}',
-            'error': error_detail
-        }
 
 
 @app.route('/api/download/<filename>')
