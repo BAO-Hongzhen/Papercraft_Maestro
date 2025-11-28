@@ -51,7 +51,7 @@ pip install -r requirements_flask.txt
 
 - 大觉新春剪纸_V1.safetensors
 
-   下载链接：https://www.liblib.art/modelinfo/8714482561d4481d96113ae95e539e28?from=search&versionUuid=a69bec3ddfec4d0bae33c567001fd04f
+   下载链接：https://drive.google.com/file/d/1eXedHyMzIk0YYvr7jLChjj7yMlRA_dUA/view?usp=sharing
 
    部署位置：ComfyUI所在位置/models/loras
 
