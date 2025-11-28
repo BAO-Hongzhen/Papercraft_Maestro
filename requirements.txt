@@ -12,3 +12,5 @@ numpy
 # ComfyUI 相关
 requests==2.31.0
 websocket-client==1.6.1
+comfy_api_simplified
+websockets
