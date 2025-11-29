@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
     from ComfyUI_api import FluxComfyUI_Generator
-    from Image_Processing import desaturate_image, increase_contrast, remove_white_background, convert_to_red
+    from Image_Processing import desaturate_image, increase_contrast, remove_white_background, convert_to_red, render_on_window, render_on_wall, render_on_door, render_on_package
 except ImportError:
     pass # Will handle gracefully later
 
@@ -32,38 +32,87 @@ def img_to_base64(img):
     return base64.b64encode(buff.getvalue()).decode()
 
 def create_seamless_pattern():
-    """Create a distinct tiled background with placeholder images"""
-    # Create a tile with 4 distinct "images" to simulate a collage
-    w, h = 256, 256  # Reduced size for better performance
-    img = Image.new('RGBA', (w, h), (255, 255, 255, 0))
-    draw = ImageDraw.Draw(img)
+    """Create a distinct tiled background using random papercuts from ui_assets with paper texture (3x3 grid)"""
+    import random
+    import numpy as np
     
-    # Helper to draw a "framed picture"
-    def draw_frame(x, y, color, shape_type):
-        # Frame
-        draw.rectangle([x, y, x+118, y+118], outline='#8B0000', width=3)
-        # Content
-        cx, cy = x + 59, y + 59
-        if shape_type == 'circle':
-            draw.ellipse([cx-40, cy-40, cx+40, cy+40], fill=color)
-        elif shape_type == 'square':
-            draw.rectangle([cx-40, cy-40, cx+40, cy+40], fill=color)
-        elif shape_type == 'diamond':
-            draw.polygon([(cx, cy-45), (cx+45, cy), (cx, cy+45), (cx-45, cy)], fill=color)
-        elif shape_type == 'flower':
-            for i in range(0, 360, 45):
-                import math
-                rad = math.radians(i)
-                ox = cx + 25 * math.cos(rad)
-                oy = cy + 25 * math.sin(rad)
-                draw.ellipse([ox-15, oy-15, ox+15, oy+15], fill=color)
+    # 1. Try to load images from ui_assets
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    assets_dir = os.path.join(base_dir, 'ui_assets')
     
-    # Draw 4 quadrants
-    draw_frame(5, 5, '#980015', 'circle')      # Top-Left: Red Circle
-    draw_frame(133, 5, '#DAA520', 'square')     # Top-Right: Gold Square
-    draw_frame(5, 133, '#5C4033', 'flower')     # Bottom-Left: Brown Flower
-    draw_frame(133, 133, '#191970', 'diamond')   # Bottom-Right: Blue Diamond
+    papercuts = []
+    if os.path.exists(assets_dir):
+        for f in os.listdir(assets_dir):
+            if f.endswith('.png') or f.endswith('.jpg'):
+                papercuts.append(os.path.join(assets_dir, f))
     
+    # 2. Setup Canvas (768x768 for 3x3 grid of 256x256 cells)
+    cell_size = 256
+    grid_size = 3
+    w, h = cell_size * grid_size, cell_size * grid_size
+    
+    # Generate Paper Texture Background
+    # Warm white base color (R, G, B, A)
+    base_color = [253, 251, 247, 255] 
+    img_array = np.full((h, w, 4), base_color, dtype=np.uint8)
+    
+    # Add random noise for texture
+    noise = np.random.randint(-5, 5, (h, w, 4), dtype=np.int16)
+    # Apply noise only to RGB channels, keep Alpha 255
+    img_array[:, :, :3] = np.clip(img_array[:, :, :3] + noise[:, :, :3], 0, 255)
+    
+    img = Image.fromarray(img_array.astype(np.uint8), 'RGBA')
+    
+    # 3. If valid images found, add them to the collage
+    if papercuts:
+        # Select 9 unique random images (if enough exist)
+        if len(papercuts) >= grid_size * grid_size:
+            selected = random.sample(papercuts, k=grid_size * grid_size)
+        else:
+            # Fallback if not enough unique images
+            selected = random.choices(papercuts, k=grid_size * grid_size)
+        
+        for idx, path in enumerate(selected):
+            try:
+                p_img = Image.open(path).convert('RGBA')
+                
+                # Resize to fit in cell (256x256) with LESS padding
+                # Target size: 230x230 to reduce spacing
+                p_img.thumbnail((230, 230), Image.Resampling.LANCZOS)
+                
+                # Calculate row and col
+                row = idx // grid_size
+                col = idx % grid_size
+                
+                # Cell top-left coordinates
+                cell_x = col * cell_size
+                cell_y = row * cell_size
+                
+                # No rotation
+                # angle = 0 
+                # p_img = p_img.rotate(angle, expand=True, resample=Image.Resampling.BICUBIC)
+                
+                # Calculate centered position in cell
+                px = cell_x + (cell_size - p_img.width) // 2
+                py = cell_y + (cell_size - p_img.height) // 2
+                
+                # Adjust opacity (make it subtle background)
+                # Create a new image with adjusted alpha
+                r, g, b, a = p_img.split()
+                # Reduce alpha to 80%
+                a = a.point(lambda x: x * 0.8) 
+                p_img.putalpha(a)
+                
+                # Paste
+                img.paste(p_img, (px, py), p_img)
+                
+            except Exception as e:
+                print(f"Error loading background asset {path}: {e}")
+                continue
+                
+        return img
+
+    # 3. Fallback
     return img
 
 def create_placeholder_scene(width=1024, height=1024, type="window"):
@@ -124,16 +173,16 @@ st.markdown(f"""
         height: 200vh;
         background-image: url("data:image/png;base64,{bg_b64}");
         background-repeat: repeat;
-        background-size: 256px 256px;
+        background-size: 768px 768px;
         opacity: 0.8; /* High opacity to ensure visibility */
         z-index: 0; /* Place at base level */
-        animation: slide 30s linear infinite;
+        animation: slide 180s linear infinite;
         pointer-events: none; /* Allow clicks to pass through */
     }}
     
     @keyframes slide {{
         0% {{ transform: translate(0, 0); }}
-        100% {{ transform: translate(-128px, -128px); }}
+        100% {{ transform: translate(-768px, -768px); }}
     }}
 
     /* Content Container Overlay */
@@ -220,8 +269,11 @@ def main():
     # Initialize Session State
     if 'generated_image' not in st.session_state:
         st.session_state.generated_image = None
+        st.session_state.generated_image = None
     if 'processed_image' not in st.session_state:
         st.session_state.processed_image = None
+    if 'scene_previews' not in st.session_state:
+        st.session_state.scene_previews = {}
     
     # Title Section
     st.markdown("""
@@ -251,6 +303,7 @@ def main():
             # Clear previous results immediately
             st.session_state.processed_image = None
             st.session_state.generated_image = None
+            st.session_state.scene_previews = {}
             results_placeholder.empty() # Explicitly clear the UI
             
             status_container = st.empty()
@@ -303,6 +356,31 @@ def main():
                         
                         st.session_state.processed_image = img
                         
+                        # Generate Scene Previews
+                        status_container.info("🏠 正在生成场景预览...")
+                        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                        static_images_dir = os.path.join(base_dir, 'static', 'Base')
+                        
+                        # Window (Base_Window.jpg)
+                        window_bg = os.path.join(static_images_dir, 'Base_Window.jpg')
+                        if os.path.exists(window_bg):
+                            st.session_state.scene_previews['window'] = render_on_window(img, window_bg)
+                        
+                        # Package (Base_package.jpg)
+                        package_bg = os.path.join(static_images_dir, 'Base_package.jpg')
+                        if os.path.exists(package_bg):
+                            st.session_state.scene_previews['package'] = render_on_package(img, package_bg)
+                            
+                        # Door (Base_door.jpg)
+                        door_bg = os.path.join(static_images_dir, 'Base_door.jpg')
+                        if os.path.exists(door_bg):
+                            st.session_state.scene_previews['door'] = render_on_door(img, door_bg)
+                            
+                        # Wall (Base_wall.jpeg)
+                        wall_bg = os.path.join(static_images_dir, 'Base_wall.jpeg')
+                        if os.path.exists(wall_bg):
+                            st.session_state.scene_previews['wall'] = render_on_wall(img, wall_bg)
+                        
                         progress_bar.progress(100)
                         status_container.success("✅ 创作完成！")
                         time.sleep(1)
@@ -346,37 +424,40 @@ def main():
     
             # Scene Simulation
             st.markdown("---")
-            st.markdown("<h3 style='text-align: center;'>🏠 场景模拟预览</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: center;'>👀 效果预览</h3>", unsafe_allow_html=True)
             
-            col_scene1, col_scene2 = st.columns([1, 3])
-            
-            with col_scene1:
-                st.markdown("<br>", unsafe_allow_html=True)
-                scene_option = st.selectbox("选择展示场景", ["窗花 (Window)", "墙壁 (Wall)"])
-                preview_btn = st.button("👀 生成预览")
+            if st.session_state.scene_previews:
+                # Row 1: Window & Package (Landscape 3:2)
+                col_r1_1, col_r1_2 = st.columns(2)
                 
-            with col_scene2:
-                if preview_btn:
-                    with st.spinner("正在合成场景..."):
-                        # Create background
-                        bg_type = "window" if "Window" in scene_option else "wall"
-                        bg_img = create_placeholder_scene(type=bg_type)
+                with col_r1_1:
+                    if 'window' in st.session_state.scene_previews and st.session_state.scene_previews['window']:
+                        st.image(st.session_state.scene_previews['window'], caption="窗花效果", use_container_width=True)
+                    else:
+                        st.info("窗花预览生成失败")
                         
-                        # Composite
-                        papercut = st.session_state.processed_image.copy()
-                        target_size = int(bg_img.width * 0.6)
-                        papercut = papercut.resize((target_size, target_size), Image.Resampling.LANCZOS)
+                with col_r1_2:
+                    if 'package' in st.session_state.scene_previews and st.session_state.scene_previews['package']:
+                        st.image(st.session_state.scene_previews['package'], caption="包装效果", use_container_width=True)
+                    else:
+                        st.info("包装预览生成失败")
+                
+                # Row 2: Door & Wall (Square 1:1)
+                col_r2_1, col_r2_2 = st.columns(2)
+                
+                with col_r2_1:
+                    if 'door' in st.session_state.scene_previews and st.session_state.scene_previews['door']:
+                        st.image(st.session_state.scene_previews['door'], caption="门贴效果", use_container_width=True)
+                    else:
+                        st.info("门贴预览生成失败")
                         
-                        # Center position
-                        x = (bg_img.width - papercut.width) // 2
-                        y = (bg_img.height - papercut.height) // 2
-                        
-                        # Paste
-                        bg_img.paste(papercut, (x, y), papercut)
-                        
-                        st.image(bg_img, caption=f"{scene_option}效果预览", use_container_width=True)
-
-                    st.image(bg_img, caption=f"{scene_option}效果预览", use_container_width=True)
+                with col_r2_2:
+                    if 'wall' in st.session_state.scene_previews and st.session_state.scene_previews['wall']:
+                        st.image(st.session_state.scene_previews['wall'], caption="墙壁效果", use_container_width=True)
+                    else:
+                        st.info("墙壁预览生成失败")
+            else:
+                st.warning("⚠️ 预览图生成失败，请检查资源文件。")
 
 if __name__ == "__main__":
     main()
