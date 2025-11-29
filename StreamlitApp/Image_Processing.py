@@ -111,16 +111,31 @@ def process_image_for_papercut(image_path: str) -> str:
         return None
 
 
-def render_on_window(papercut_path: str, scene_path: str, output_path: str) -> bool:
+def render_on_window(papercut_input, scene_input, output_path=None) -> Image.Image:
     """
     渲染到窗户场景
+    Args:
+        papercut_input: 剪纸图片路径 (str) 或 PIL.Image 对象
+        scene_input: 场景图片路径 (str) 或 PIL.Image 对象
+        output_path: (可选) 输出路径，如果提供则保存
+    Returns:
+        PIL.Image: 合成后的图片
     """
     try:
-        papercut = Image.open(papercut_path).convert('RGBA')
-        scene = Image.open(scene_path).convert('RGB')
+        # Load Papercut
+        if isinstance(papercut_input, str):
+            papercut = Image.open(papercut_input).convert('RGBA')
+        else:
+            papercut = papercut_input.convert('RGBA')
+
+        # Load Scene
+        if isinstance(scene_input, str):
+            scene = Image.open(scene_input).convert('RGB')
+        else:
+            scene = scene_input.convert('RGB')
         
         # 准备剪纸图片用于窗户场景合成
-        # 1. 调整尺寸为 1736x1736
+        # 1. 调整尺寸为 1736x1736 (Base_Window.jpg 5760x3840)
         papercut = papercut.resize((1736, 1736), Image.Resampling.LANCZOS)
         # 2. 应用特定颜色 (#980015) 和透明度 (75%)
         processed_papercut = convert_to_red(papercut, color=(152, 0, 21), opacity=0.75)
@@ -132,27 +147,162 @@ def render_on_window(papercut_path: str, scene_path: str, output_path: str) -> b
         scene_rgba.paste(processed_papercut, (x, y), processed_papercut)
         
         final_image = scene_rgba.convert('RGB')
-        final_image.save(output_path)
-        return True
+        
+        if output_path:
+            final_image.save(output_path)
+            
+        return final_image
     except Exception as e:
         print(f"Error rendering on window: {e}")
-        return False
+        return None
 
 
-def render_on_wall(papercut_path: str, scene_path: str, output_path: str) -> bool:
+def render_on_wall(papercut_input, scene_input, output_path=None) -> Image.Image:
     """
-    渲染到墙壁场景 (暂未实现)
+    渲染到墙壁场景
     """
-    print("Render on wall not implemented yet.")
-    return False
+    try:
+        # Load Papercut
+        if isinstance(papercut_input, str):
+            papercut = Image.open(papercut_input).convert('RGBA')
+        else:
+            papercut = papercut_input.convert('RGBA')
+
+        # Load Scene
+        if isinstance(scene_input, str):
+            scene = Image.open(scene_input).convert('RGB')
+        else:
+            scene = scene_input.convert('RGB')
+            
+        # Base_wall.jpeg (768x768)
+        # 剪纸图片缩放至背景高度的49.48%
+        target_height = int(scene.height * 0.4948)
+        aspect_ratio = papercut.width / papercut.height
+        target_width = int(target_height * aspect_ratio)
+        
+        papercut = papercut.resize((target_width, target_height), Image.Resampling.LANCZOS)
+        processed_papercut = convert_to_red(papercut, color=(152, 0, 21), opacity=0.9) 
+        
+        # 图片中心点在 高37.3%，宽66.67%
+        center_x = int(scene.width * 0.6667)
+        center_y = int(scene.height * 0.373)
+        
+        x = center_x - target_width // 2
+        y = center_y - target_height // 2
+        
+        scene_rgba = scene.convert('RGBA')
+        scene_rgba.paste(processed_papercut, (x, y), processed_papercut)
+        
+        final_image = scene_rgba.convert('RGB')
+        
+        if output_path:
+            final_image.save(output_path)
+            
+        return final_image
+    except Exception as e:
+        print(f"Error rendering on wall: {e}")
+        return None
 
 
-def render_on_door(papercut_path: str, scene_path: str, output_path: str) -> bool:
+def render_on_door(papercut_input, scene_input, output_path=None) -> Image.Image:
     """
-    渲染到门场景 (暂未实现)
+    渲染到门场景
     """
-    print("Render on door not implemented yet.")
-    return False
+    try:
+        # Load Papercut
+        if isinstance(papercut_input, str):
+            papercut = Image.open(papercut_input).convert('RGBA')
+        else:
+            papercut = papercut_input.convert('RGBA')
+
+        # Load Scene
+        if isinstance(scene_input, str):
+            scene = Image.open(scene_input).convert('RGB')
+        else:
+            scene = scene_input.convert('RGB')
+            
+        # Base_door.jpg (799x799)
+        # 剪纸图片缩放至背景高度的18%
+        target_height = int(scene.height * 0.18)
+        aspect_ratio = papercut.width / papercut.height
+        target_width = int(target_height * aspect_ratio)
+        
+        papercut = papercut.resize((target_width, target_height), Image.Resampling.LANCZOS)
+        processed_papercut = convert_to_red(papercut, color=(152, 0, 21), opacity=0.9)
+        
+        # 图片中心点在 高36.3%，宽62.45%
+        center_x = int(scene.width * 0.6245)
+        center_y = int(scene.height * 0.363)
+        
+        x = center_x - target_width // 2
+        y = center_y - target_height // 2
+        
+        scene_rgba = scene.convert('RGBA')
+        scene_rgba.paste(processed_papercut, (x, y), processed_papercut)
+        
+        final_image = scene_rgba.convert('RGB')
+        
+        if output_path:
+            final_image.save(output_path)
+            
+        return final_image
+    except Exception as e:
+        print(f"Error rendering on door: {e}")
+        return None
+
+
+def render_on_package(papercut_input, scene_input, output_path=None) -> Image.Image:
+    """
+    渲染到包装场景
+    """
+    try:
+        # Load Papercut
+        if isinstance(papercut_input, str):
+            papercut = Image.open(papercut_input).convert('RGBA')
+        else:
+            papercut = papercut_input.convert('RGBA')
+
+        # Load Scene
+        if isinstance(scene_input, str):
+            scene = Image.open(scene_input).convert('RGB')
+        else:
+            scene = scene_input.convert('RGB')
+            
+        # Base_package.jpg (4032x2688)
+        # 剪纸图片大小缩放至背景图片的25%左右 (宽)
+        target_width = int(scene.width * 0.25)
+        aspect_ratio = papercut.height / papercut.width
+        target_height = int(target_width * aspect_ratio)
+        
+        papercut = papercut.resize((target_width, target_height), Image.Resampling.LANCZOS)
+        # 模拟印刷质感：稍微降低不透明度
+        processed_papercut = convert_to_red(papercut, color=(152, 0, 21), opacity=0.85)
+        
+        # 旋转 33度 (逆时针)
+        processed_papercut = processed_papercut.rotate(33, expand=True, resample=Image.Resampling.BICUBIC)
+        
+        # 图片中心点位置在 高48.33%，宽48%
+        center_x = int(scene.width * 0.48)
+        center_y = int(scene.height * 0.4833)
+        
+        # 旋转后尺寸会变，需重新获取尺寸
+        new_width, new_height = processed_papercut.size
+        
+        x = center_x - new_width // 2
+        y = center_y - new_height // 2
+        
+        scene_rgba = scene.convert('RGBA')
+        scene_rgba.paste(processed_papercut, (x, y), processed_papercut)
+        
+        final_image = scene_rgba.convert('RGB')
+        
+        if output_path:
+            final_image.save(output_path)
+            
+        return final_image
+    except Exception as e:
+        print(f"Error rendering on package: {e}")
+        return None
 
 
 def main():
