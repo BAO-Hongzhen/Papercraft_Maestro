@@ -147,9 +147,7 @@ A: **不需要**。我们的系统已经内置了最佳的风格化提示词（"
 感谢以下成员对本项目做出的贡献：
 
 <a href="https://github.com/BAO-Hongzhen/Syntax_Roulette/graphs/contributors">
-
-  <img src="https://contrib.rocks/image?repo=BAO-Hongzhen/Syntax_Roulette" alt="contrib.rocks image" />
-
+ <img src="https://contrib.rocks/image?repo=BAO-Hongzhen/Syntax_Roulette" alt="contrib.rocks image" />
 </a>
 
 ## 许可证
