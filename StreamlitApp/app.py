@@ -11,10 +11,18 @@ import numpy as np
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
-    from ComfyUI_api import FluxComfyUI_Generator
-    from Image_Processing import desaturate_image, increase_contrast, remove_white_background, convert_to_red
+    from comfy_api import ComfyUIManager
+    from Image_Processing import desaturate_image, increase_contrast, remove_white_background, convert_to_red, render_on_window, render_on_wall, render_on_door
 except ImportError:
     pass # Will handle gracefully later
+
+# --- Path Settings ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+WORKFLOW_PATH = os.path.join(BASE_DIR, "ComfyUI_Workflow", "paper_cut.json")
+OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+# Ensure output directory exists
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
 
 # Page Configuration
 st.set_page_config(
@@ -257,63 +265,47 @@ def main():
             progress_bar = st.progress(0)
             
             try:
-                # Initialize Generator
+                # Initialize Generator (Updated to use ComfyUIManager)
                 status_container.info("🔌 正在连接 ComfyUI 服务...")
                 progress_bar.progress(10)
                 
-                try:
-                    generator = FluxComfyUI_Generator()
-                    connection_ok = generator.test_connection()
-                except Exception:
-                    connection_ok = False
+                # Initialize Manager
+                manager = ComfyUIManager(WORKFLOW_PATH)
                 
-                if not connection_ok:
-                    status_container.error("❌ 无法连接到 ComfyUI，请确保服务已启动 (127.0.0.1:8188)")
+                # Generate
+                status_container.info("🎨 正在绘制剪纸图案 (这可能需要几十秒)...")
+                progress_bar.progress(30)
+                
+                # Use the new API structure
+                output_path = manager.generate_image(prompt, OUTPUT_DIR)
+                
+                if output_path:
+                    progress_bar.progress(70)
+                    status_container.info("✂️ 正在进行剪纸工艺处理 (去底、上色)...")
+                    
+                    # Process
+                    img = Image.open(output_path)
+                    st.session_state.generated_image = img
+                    
+                    # Processing steps
+                    img = desaturate_image(img)
+                    img = increase_contrast(img, factor=3.0)
+                    img = remove_white_background(img, threshold=230)
+                    img = convert_to_red(img)
+                    
+                    st.session_state.processed_image = img
+                    
+                    progress_bar.progress(100)
+                    status_container.success("✅ 创作完成！")
+                    time.sleep(1)
+                    status_container.empty()
+                    progress_bar.empty()
+                    
+                    # Rerun to update button state
+                    st.rerun()
+                    
                 else:
-                    # Generate (Using default parameters)
-                    status_container.info("🎨 正在绘制剪纸图案 (这可能需要几十秒)...")
-                    progress_bar.progress(30)
-                    
-                    first_part = "A vibrant red Chinese paper"
-                    second_part = "complex Chinese patterns, stand proudly among the swirling clouds and stylized clouds. The background is pure white, emphasizing a bold traditional design"
-                    
-                    result = generator.generate_image(
-                        first_part=first_part,
-                        user_prompt=prompt,
-                        second_part=second_part,
-                        steps=30, # Default
-                        cfg=1.0,  # Default
-                        seed=None # Random
-                    )
-                    
-                    if result['success']:
-                        progress_bar.progress(70)
-                        status_container.info("✂️ 正在进行剪纸工艺处理 (去底、上色)...")
-                        
-                        # Process
-                        original_path = result['filename']
-                        img = Image.open(original_path)
-                        st.session_state.generated_image = img
-                        
-                        # Processing steps
-                        img = desaturate_image(img)
-                        img = increase_contrast(img, factor=3.0)
-                        img = remove_white_background(img, threshold=230)
-                        img = convert_to_red(img)
-                        
-                        st.session_state.processed_image = img
-                        
-                        progress_bar.progress(100)
-                        status_container.success("✅ 创作完成！")
-                        time.sleep(1)
-                        status_container.empty()
-                        progress_bar.empty()
-                        
-                        # Rerun to update button state
-                        st.rerun()
-                        
-                    else:
-                        status_container.error(f"❌ 生成失败: {result.get('error')}")
+                    status_container.error(f"❌ 生成失败: 未能从ComfyUI获取图片")
             
             except Exception as e:
                 status_container.error(f"❌ 发生错误: {e}")
