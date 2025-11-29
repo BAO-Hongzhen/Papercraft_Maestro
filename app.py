@@ -203,10 +203,41 @@ def _generate_with_comfyui(prompt: str, scene_type: str, scene_image_path: str =
         
         steps_info.append("✅ 剪纸图案生成成功！")
         
+        # --- 预生成场景图 (Pre-render scenes) ---
+        steps_info.append("🖼️ 正在生成场景预览...")
+        scene_urls = {}
+        
+        # 1. Window
+        window_scene_path = os.path.join('Assets', 'Prototype_Images', 'Prototype_Window.jpg')
+        if os.path.exists(window_scene_path):
+            window_output_filename = f"scene_window_{timestamp}.png"
+            window_output_path = os.path.join(app.config['SCENE_FOLDER'], window_output_filename)
+            if render_on_window(output_path, window_scene_path, window_output_path):
+                scene_urls['window'] = f'/scene/{window_output_filename}'
+        
+        # 2. Wall
+        wall_scene_path = os.path.join('Assets', 'Prototype_Images', 'Prototype_Wall.jpg')
+        if os.path.exists(wall_scene_path):
+            wall_output_filename = f"scene_wall_{timestamp}.png"
+            wall_output_path = os.path.join(app.config['SCENE_FOLDER'], wall_output_filename)
+            if render_on_wall(output_path, wall_scene_path, wall_output_path):
+                scene_urls['wall'] = f'/scene/{wall_output_filename}'
+                
+        # 3. Door
+        door_scene_path = os.path.join('Assets', 'Prototype_Images', 'Prototype_Door.jpg')
+        if os.path.exists(door_scene_path):
+            door_output_filename = f"scene_door_{timestamp}.png"
+            door_output_path = os.path.join(app.config['SCENE_FOLDER'], door_output_filename)
+            if render_on_door(output_path, door_scene_path, door_output_path):
+                scene_urls['door'] = f'/scene/{door_output_filename}'
+        
+        steps_info.append("✅ 场景预览生成完毕")
+
         return {
             'success': True,
             'message': '✅ 剪纸图案生成成功！',
             'image_url': f'/output/{output_filename}',
+            'scene_urls': scene_urls,
             'original_image': f'/generated/{generated_filename}',
             'prompt': prompt,
             'scene_type': scene_type,

@@ -6,6 +6,7 @@
 // ========== 全局变量 ==========
 let currentImageUrl = '';
 let currentPrompt = '';
+let currentSceneUrls = {}; // 存储预生成的场景图URL
 
 // ========== DOM 元素 ==========
 const ui1Container = document.getElementById('ui-page-1');
@@ -46,6 +47,7 @@ function switchToMainPage() {
     promptInput.value = '';
     currentImageUrl = '';
     currentPrompt = '';
+    currentSceneUrls = {}; // 清空场景缓存
 }
 
 /**
@@ -145,6 +147,12 @@ async function generatePapercut() {
             currentImageUrl = data.image_url;
             resultImage.src = currentImageUrl;
             
+            // 保存预生成的场景图URL
+            if (data.scene_urls) {
+                currentSceneUrls = data.scene_urls;
+                console.log('🖼️ 收到预生成场景图:', currentSceneUrls);
+            }
+            
             // 图片加载完成后隐藏加载状态
             resultImage.onload = () => {
                 hideLoading();
@@ -207,17 +215,52 @@ async function renderInScene() {
     }
     
     console.log('🎬 切换到场景渲染页面');
-    console.log('📝 当前图片URL:', currentImageUrl);
     
     // 切换到场景页面
     switchToScenePage();
     
-    // 为每个场景生成合成图片
-    await generateAllSceneComposites();
+    // 如果有预生成的场景图，直接显示
+    if (currentSceneUrls && Object.keys(currentSceneUrls).length > 0) {
+        console.log('⚡ 使用预生成场景图');
+        updateScenesWithUrls(currentSceneUrls);
+    } else {
+        // 否则回退到现场生成
+        console.log('⚠️ 无预生成图，开始现场生成...');
+        await generateAllSceneComposites();
+    }
 }
 
 /**
- * 为所有场景生成合成图片
+ * 使用给定的 URL 更新场景显示
+ */
+function updateScenesWithUrls(urls) {
+    const scenes = ['window', 'wall', 'door'];
+    
+    scenes.forEach(scene => {
+        if (urls[scene]) {
+            const preview = document.getElementById(`scene-preview-${scene}`);
+            const overlay = document.getElementById(`papercut-overlay-${scene}`);
+            
+            if (preview) {
+                // 隐藏叠加层
+                if (overlay) overlay.style.display = 'none';
+                
+                // 更新背景
+                const bgImg = preview.querySelector('.scene-bg');
+                if (bgImg) {
+                    bgImg.src = urls[scene];
+                }
+                
+                // 保存下载链接
+                preview.dataset.compositeUrl = urls[scene];
+                console.log(`✅ ${scene} 场景已更新`);
+            }
+        }
+    });
+}
+
+/**
+ * 为所有场景生成合成图片 (回退方案)
  */
 async function generateAllSceneComposites() {
     const scenes = ['window', 'wall', 'door'];
@@ -246,9 +289,11 @@ async function generateAllSceneComposites() {
                 const overlay = document.getElementById(`papercut-overlay-${scene}`);
                 const preview = document.getElementById(`scene-preview-${scene}`);
                 
-                if (overlay && preview) {
-                    // 隐藏叠加层，改为显示合成后的完整图片
-                    overlay.style.display = 'none';
+                if (preview) {
+                    // 隐藏叠加层（如果存在）
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                    }
                     
                     // 更新背景为合成图
                     const bgImg = preview.querySelector('.scene-bg');
@@ -274,16 +319,9 @@ async function generateAllSceneComposites() {
  * 加载剪纸到所有场景
  */
 function loadPapercutToScenes() {
-    const scenes = ['door', 'wall', 'window'];
-    
-    scenes.forEach(scene => {
-        const overlay = document.getElementById(`papercut-overlay-${scene}`);
-        if (overlay) {
-            overlay.src = currentImageUrl;
-            overlay.style.display = 'block';
-            console.log(`✅ 剪纸已加载到 ${scene} 场景`);
-        }
-    });
+    // 此函数不再需要显示叠加层，因为 generateAllSceneComposites 会直接替换背景图
+    // 但为了在合成完成前不显示空白，可以先不操作，或者显示加载动画
+    console.log('⏳ 等待场景合成...');
 }
 
 /**
