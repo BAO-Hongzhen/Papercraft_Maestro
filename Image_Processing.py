@@ -65,6 +65,36 @@ def convert_to_red(image: Image.Image, color: tuple = (255, 0, 0), opacity: floa
     return Image.fromarray(img_array, 'RGBA')
 
 
+def apply_color_effect(base_img: Image.Image, color: tuple) -> Image.Image:
+    """
+    模拟图层混合模式 'Color': 
+    使用 base_img 的亮度 (Luminance/Value)
+    使用 color 的色相 (Hue) 和饱和度 (Saturation)
+    """
+    # 确保 base_img 是 RGB 模式以便转换
+    if base_img.mode != 'RGB':
+        base_img = base_img.convert('RGB')
+        
+    # 1. 转换 base 到 HSV 获取 V
+    base_hsv = base_img.convert('HSV')
+    base_np = np.array(base_hsv)
+    v_channel = base_np[:, :, 2]
+    
+    # 2. 创建纯色图片并转 HSV 获取 H, S
+    color_layer = Image.new('RGB', base_img.size, color)
+    color_hsv = color_layer.convert('HSV')
+    color_np = np.array(color_hsv)
+    
+    h_channel = color_np[:, :, 0]
+    s_channel = color_np[:, :, 1]
+    
+    # 3. 组合新的 HSV 图片
+    new_hsv_np = np.dstack((h_channel, s_channel, v_channel))
+    new_hsv_img = Image.fromarray(new_hsv_np, 'HSV')
+    
+    return new_hsv_img.convert('RGB')
+
+
 def process_image_for_papercut(image_path: str) -> str:
     """
     完整的剪纸图像处理流程

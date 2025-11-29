@@ -16,6 +16,14 @@ try:
 except ImportError:
     pass # Will handle gracefully later
 
+# --- Path Settings ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+WORKFLOW_PATH = os.path.join(BASE_DIR, "ComfyUI_Workflow", "paper_cut.json")
+OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+# Ensure output directory exists
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
+
 # Page Configuration
 st.set_page_config(
     page_title="剪纸大师 - 传统艺术生成器",
@@ -310,7 +318,7 @@ def main():
             progress_bar = st.progress(0)
             
             try:
-                # Initialize Generator
+                # Initialize Generator (Updated to use ComfyUIManager)
                 status_container.info("🔌 正在连接 ComfyUI 服务...")
                 progress_bar.progress(10)
                 
