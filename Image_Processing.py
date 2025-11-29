@@ -65,6 +65,36 @@ def convert_to_red(image: Image.Image, color: tuple = (255, 0, 0), opacity: floa
     return Image.fromarray(img_array, 'RGBA')
 
 
+def apply_color_effect(base_img: Image.Image, color: tuple) -> Image.Image:
+    """
+    模拟图层混合模式 'Color': 
+    使用 base_img 的亮度 (Luminance/Value)
+    使用 color 的色相 (Hue) 和饱和度 (Saturation)
+    """
+    # 确保 base_img 是 RGB 模式以便转换
+    if base_img.mode != 'RGB':
+        base_img = base_img.convert('RGB')
+        
+    # 1. 转换 base 到 HSV 获取 V
+    base_hsv = base_img.convert('HSV')
+    base_np = np.array(base_hsv)
+    v_channel = base_np[:, :, 2]
+    
+    # 2. 创建纯色图片并转 HSV 获取 H, S
+    color_layer = Image.new('RGB', base_img.size, color)
+    color_hsv = color_layer.convert('HSV')
+    color_np = np.array(color_hsv)
+    
+    h_channel = color_np[:, :, 0]
+    s_channel = color_np[:, :, 1]
+    
+    # 3. 组合新的 HSV 图片
+    new_hsv_np = np.dstack((h_channel, s_channel, v_channel))
+    new_hsv_img = Image.fromarray(new_hsv_np, 'HSV')
+    
+    return new_hsv_img.convert('RGB')
+
+
 def process_image_for_papercut(image_path: str) -> str:
     """
     完整的剪纸图像处理流程
@@ -141,18 +171,70 @@ def render_on_window(papercut_path: str, scene_path: str, output_path: str) -> b
 
 def render_on_wall(papercut_path: str, scene_path: str, output_path: str) -> bool:
     """
-    渲染到墙壁场景 (暂未实现)
+    渲染到墙壁场景
     """
-    print("Render on wall not implemented yet.")
-    return False
+    try:
+        papercut = Image.open(papercut_path).convert('RGBA')
+        scene = Image.open(scene_path).convert('RGB')
+        
+        # 准备剪纸图片
+        # 1. 调整尺寸为 1339x1339
+        papercut = papercut.resize((1339, 1339), Image.Resampling.LANCZOS)
+        # 2. 应用特定颜色 (#C5493C -> 197, 73, 60) 和透明度 (90%)
+        processed_papercut = convert_to_red(papercut, color=(197, 73, 60), opacity=0.9)
+        
+        # Wall coordinates
+        x, y = 1208, 305
+        
+        scene_rgba = scene.convert('RGBA')
+        scene_rgba.paste(processed_papercut, (x, y), processed_papercut)
+        
+        final_image = scene_rgba.convert('RGB')
+        final_image.save(output_path)
+        return True
+    except Exception as e:
+        print(f"Error rendering on wall: {e}")
+        return False
 
 
 def render_on_door(papercut_path: str, scene_path: str, output_path: str) -> bool:
     """
-    渲染到门场景 (暂未实现)
+    渲染到门场景 (Effect: color)
     """
-    print("Render on door not implemented yet.")
-    return False
+    try:
+        papercut = Image.open(papercut_path).convert('RGBA')
+        scene = Image.open(scene_path).convert('RGB')
+        
+        # Door coordinates and size
+        x, y = 1792, 1080
+        w, h = 465, 465
+        
+        # 1. 调整尺寸
+        papercut = papercut.resize((w, h), Image.Resampling.LANCZOS)
+        
+        # 2. 截取背景区域
+        scene_crop = scene.crop((x, y, x + w, y + h))
+        
+        # 3. 应用 'Color' 混合模式效果
+        # 目标颜色: #DF3033 -> (223, 48, 51)
+        blended_crop = apply_color_effect(scene_crop, color=(223, 48, 51))
+        
+        # 4. 准备 Mask (基于剪纸 Alpha 和 透明度 0.9)
+        mask = papercut.split()[3] # Alpha channel
+        # 应用全局透明度 0.9
+        mask = ImageEnhance.Brightness(mask).enhance(0.9)
+        
+        # 5. 合成：在 scene_crop 上覆盖 blended_crop，使用 mask
+        final_crop = Image.composite(blended_crop, scene_crop, mask)
+        
+        # 6. 贴回原图
+        scene.paste(final_crop, (x, y))
+        
+        scene.save(output_path)
+        return True
+    except Exception as e:
+        print(f"Error rendering on door: {e}")
+        return False
 
 
 def main():
