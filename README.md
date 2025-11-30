@@ -89,7 +89,7 @@ pip install -r requirements.txt
 
 This project relies on a locally running ComfyUI service. Please ensure you have installed ComfyUI and downloaded the following necessary model files, placing them in the corresponding ComfyUI directories:
 
-| Model Type | Filename | Download Link (Example) | Path (from ComfyUI root) |
+| Model Type | Filename | Download Link | Path (from ComfyUI root) |
 | :--- | :--- | :--- | :--- |
 | **UNET (Flux)** | `flux1-dev-fp8.safetensors` | [HuggingFace](https://huggingface.co/Kijai/flux-fp8/blob/main/flux1-dev-fp8.safetensors) | `models/diffusion_models/` |
 | **CLIP** | `clip_l.safetensors` | [HuggingFace](https://huggingface.co/comfyanonymous/flux_text_encoders/blob/main/clip_l.safetensors) | `models/clip/` |
