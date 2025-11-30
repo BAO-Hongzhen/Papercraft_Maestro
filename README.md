@@ -67,8 +67,8 @@ Ensure Python 3.8+ and Git are installed on your computer.
 Clone the project locally:
 
 ```bash
-git clone [repository_url]
-cd Syntax_Roulette
+git clone https://github.com/BAO-Hongzhen/Papercraft_Maestro.git
+cd Papercraft_Maestro
 ```
 
 ### 2. Install Python Dependencies

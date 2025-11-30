@@ -67,8 +67,8 @@
 克隆项目到本地：
 
 ```bash
-git clone [repository_url]
-cd Syntax_Roulette
+git clone https://github.com/BAO-Hongzhen/Papercraft_Maestro.git
+cd Papercraft_Maestro
 ```
 
 ### 2\. 安装 Python 依赖
