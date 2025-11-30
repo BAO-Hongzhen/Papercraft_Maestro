@@ -30,7 +30,7 @@ for d in [OUTPUT_DIR, PROCESSED_DIR, RENDERED_DIR]:
 
 # Page Configuration
 st.set_page_config(
-    page_title="剪纸大师 - 传统艺术生成器",
+    page_title="Papercraft Maestro",
     page_icon="🏮",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -289,19 +289,19 @@ def main():
     # Title Section
     st.markdown("""
         <div class="title-container">
-            <h1>🏮 剪 纸 大 师 🏮</h1>
+            <h1>Papercraft Maestro</h1>
         </div>
     """, unsafe_allow_html=True)
 
     # Input Section
-    prompt = st.text_area("✍️ 请输入您的创意描述", height=100, placeholder="例如：一只站在梅花枝头的喜鹊，背景是祥云纹样...", label_visibility="collapsed")
+    prompt = st.text_area("✍️ Enter your creative description", height=100, placeholder="e.g., tiger, flower, superman or a sentence...", label_visibility="collapsed")
     
     # Generate Button (Centered)
     # Use a narrower middle column for better visual centering
     col_btn1, col_btn2, col_btn3 = st.columns([3, 2, 3])
     with col_btn2:
         # Dynamic button label
-        btn_label = "🔄 重 新 生 成" if st.session_state.processed_image else "🎨 开 始 创 作"
+        btn_label = "Regen" if st.session_state.processed_image else "Generate"
         generate_btn = st.button(btn_label)
 
     # Create a placeholder for results to allow explicit clearing
@@ -309,7 +309,7 @@ def main():
 
     if generate_btn:
         if not prompt:
-            st.warning("⚠️ 请先输入描述！")
+            st.warning("⚠️ Please enter a description first!")
         else:
             # Clear previous results immediately
             st.session_state.processed_image = None
@@ -322,7 +322,7 @@ def main():
             
             try:
                 # Initialize Generator (Updated to use ComfyUIManager)
-                status_container.info("🔌 正在连接 ComfyUI 服务...")
+                status_container.info("🔌 Connecting to ComfyUI service...")
                 progress_bar.progress(10)
                 
                 try:
@@ -334,10 +334,10 @@ def main():
                     connection_ok = False
                 
                 if not connection_ok:
-                    status_container.error("❌ 无法连接到 ComfyUI，请确保服务已启动 (127.0.0.1:8188)")
+                    status_container.error("❌ Cannot connect to ComfyUI. Please ensure the service is running (127.0.0.1:8188)")
                 else:
                     # Generate (Using default parameters)
-                    status_container.info("🎨 正在绘制剪纸图案 (这可能需要几十秒)...")
+                    status_container.info("🎨 Generating papercut pattern (this may take a few seconds)...")
                     progress_bar.progress(30)
                     
                     # Generate image using manager
@@ -345,7 +345,7 @@ def main():
                     
                     if raw_image_path:
                         progress_bar.progress(70)
-                        status_container.info("✂️ 正在进行剪纸工艺处理 (去底、上色)...")
+                        status_container.info("✂️ Processing papercut (removing background, coloring)...")
                         
                         # Process
                         img = Image.open(raw_image_path)
@@ -366,7 +366,7 @@ def main():
                         img.save(processed_path)
                         
                         # Generate Scene Previews
-                        status_container.info("🏠 正在生成场景预览...")
+                        status_container.info("🏠 Generating scene previews...")
                         
                         # Use ui_assets/prototype_images for scene backgrounds
                         ui_assets_dir = os.path.join(BASE_DIR, 'ui_assets', 'prototype_images')
@@ -396,7 +396,7 @@ def main():
                             st.session_state.scene_previews['wall'] = render_on_wall(img, wall_bg, output_path)
                         
                         progress_bar.progress(100)
-                        status_container.success("✅ 创作完成！")
+                        status_container.success("✅ Creation complete!")
                         time.sleep(1)
                         status_container.empty()
                         progress_bar.empty()
@@ -405,10 +405,10 @@ def main():
                         st.rerun()
                         
                     else:
-                        status_container.error(f"❌ 生成失败: ComfyUI 未返回图片")
+                        status_container.error(f"❌ Generation failed: ComfyUI did not return an image")
             
             except Exception as e:
-                status_container.error(f"❌ 发生错误: {e}")
+                status_container.error(f"❌ Error occurred: {e}")
 
     # Results Display
     if st.session_state.processed_image:
@@ -418,11 +418,11 @@ def main():
             # Result Image (Larger - using wider column)
             col_res1, col_res2, col_res3 = st.columns([1, 8, 1]) # Much wider middle column
             with col_res2:
-                st.markdown("<h3 style='text-align: center;'>🖼️ 剪纸成品</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='text-align: center;'>Papercut Result</h3>", unsafe_allow_html=True)
                 st.image(st.session_state.processed_image, use_container_width=True)
                 
                 # Download button (Centered under image)
-                col_dl1, col_dl2, col_dl3 = st.columns([3, 2, 3])
+                col_dl1, col_dl2, col_dl3 = st.columns([1, 2, 1])
                 with col_dl2:
                     import io
                     buf = io.BytesIO()
@@ -430,7 +430,7 @@ def main():
                     byte_im = buf.getvalue()
                     
                     st.download_button(
-                        label="📥 下载剪纸图片",
+                        label="Download Papercut",
                         data=byte_im,
                         file_name=f"papercut_{int(time.time())}.png",
                         mime="image/png"
@@ -438,7 +438,7 @@ def main():
     
             # Scene Simulation
             st.markdown("---")
-            st.markdown("<h3 style='text-align: center;'>👀 效果预览</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: center;'>Scene Preview</h3>", unsafe_allow_html=True)
             
             if st.session_state.scene_previews:
                 # Row 1: Window & Package (Landscape 3:2)
@@ -446,32 +446,32 @@ def main():
                 
                 with col_r1_1:
                     if 'window' in st.session_state.scene_previews and st.session_state.scene_previews['window']:
-                        st.image(st.session_state.scene_previews['window'], caption="窗花效果", use_container_width=True)
+                        st.image(st.session_state.scene_previews['window'], caption="Window Effect", use_container_width=True)
                     else:
-                        st.info("窗花预览生成失败")
+                        st.info("Window preview failed")
                         
                 with col_r1_2:
                     if 'package' in st.session_state.scene_previews and st.session_state.scene_previews['package']:
-                        st.image(st.session_state.scene_previews['package'], caption="包装效果", use_container_width=True)
+                        st.image(st.session_state.scene_previews['package'], caption="Package Effect", use_container_width=True)
                     else:
-                        st.info("包装预览生成失败")
+                        st.info("Package preview failed")
                 
                 # Row 2: Door & Wall (Square 1:1)
                 col_r2_1, col_r2_2 = st.columns(2)
                 
                 with col_r2_1:
                     if 'door' in st.session_state.scene_previews and st.session_state.scene_previews['door']:
-                        st.image(st.session_state.scene_previews['door'], caption="门贴效果", use_container_width=True)
+                        st.image(st.session_state.scene_previews['door'], caption="Door Effect", use_container_width=True)
                     else:
-                        st.info("门贴预览生成失败")
+                        st.info("Door preview failed")
                         
                 with col_r2_2:
                     if 'wall' in st.session_state.scene_previews and st.session_state.scene_previews['wall']:
-                        st.image(st.session_state.scene_previews['wall'], caption="墙壁效果", use_container_width=True)
+                        st.image(st.session_state.scene_previews['wall'], caption="Wall Effect", use_container_width=True)
                     else:
-                        st.info("墙壁预览生成失败")
+                        st.info("Wall preview failed")
             else:
-                st.warning("⚠️ 预览图生成失败，请检查资源文件。")
+                st.warning("⚠️ Preview generation failed. Please check resource files.")
 
 if __name__ == "__main__":
     main()

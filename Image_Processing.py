@@ -1,5 +1,5 @@
 """
-图片处理脚本 - 去饱和、增强对比度、抠白色、转红色
+Image Processing Script - Desaturate, Increase Contrast, Remove White Background, Convert to Red
 """
 
 import os
@@ -9,29 +9,29 @@ import time
 
 
 def desaturate_image(image: Image.Image) -> Image.Image:
-    """将图片饱和度设为0（转为灰度，但保留RGB通道）"""
+    """Set image saturation to 0 (convert to grayscale, but keep RGB channels)"""
     enhancer = ImageEnhance.Color(image)
     return enhancer.enhance(0.0)
 
 
 def increase_contrast(image: Image.Image, factor: float = 2.0) -> Image.Image:
-    """增强图片对比度"""
+    """Increase image contrast"""
     enhancer = ImageEnhance.Contrast(image)
     return enhancer.enhance(factor)
 
 
 def remove_white_background(image: Image.Image, threshold: int = 240) -> Image.Image:
-    """移除白色背景，将白色部分变为透明"""
+    """Remove white background, make white parts transparent"""
     if image.mode != 'RGBA':
         image = image.convert('RGBA')
     
     img_array = np.array(image)
     r, g, b, a = img_array[:, :, 0], img_array[:, :, 1], img_array[:, :, 2], img_array[:, :, 3]
     
-    # 创建白色掩码：所有RGB通道都大于阈值的像素
+    # Create white mask: pixels where all RGB channels are greater than threshold
     white_mask = (r > threshold) & (g > threshold) & (b > threshold)
     
-    # 将白色像素的alpha通道设为0（完全透明）
+    # Set alpha channel of white pixels to 0 (fully transparent)
     img_array[white_mask, 3] = 0
     
     return Image.fromarray(img_array, 'RGBA')
@@ -39,12 +39,12 @@ def remove_white_background(image: Image.Image, threshold: int = 240) -> Image.I
 
 def convert_to_red(image: Image.Image, color: tuple = (255, 0, 0), opacity: float = 1.0) -> Image.Image:
     """
-    将图片所有像素转换为指定颜色，保留alpha通道并设置透明度
+    Convert all pixels of the image to the specified color, preserving the alpha channel and setting opacity
     
     Args:
-        image: 输入图片
-        color: RGB颜色元组，默认为(255, 0, 0) = 纯红色
-        opacity: 透明度，0.0-1.0，默认为1.0 (完全不透明)
+        image: Input image
+        color: RGB color tuple, default is (255, 0, 0) = Pure Red
+        opacity: Opacity, 0.0-1.0, default is 1.0 (fully opaque)
     """
     if image.mode != 'RGBA':
         image = image.convert('RGBA')
@@ -52,14 +52,14 @@ def convert_to_red(image: Image.Image, color: tuple = (255, 0, 0), opacity: floa
     img_array = np.array(image)
     a = img_array[:, :, 3]
     
-    # 将所有非透明像素设为指定颜色
+    # Set all non-transparent pixels to the specified color
     non_transparent = a > 0
     
     img_array[:, :, 0] = np.where(non_transparent, color[0], 0)  # R
     img_array[:, :, 1] = np.where(non_transparent, color[1], 0)  # G
     img_array[:, :, 2] = np.where(non_transparent, color[2], 0)  # B
     
-    # 调整透明度：将原alpha值乘以opacity
+    # Adjust opacity: multiply original alpha value by opacity
     img_array[:, :, 3] = np.where(non_transparent, (a * opacity).astype(np.uint8), 0)
     
     return Image.fromarray(img_array, 'RGBA')
@@ -67,20 +67,20 @@ def convert_to_red(image: Image.Image, color: tuple = (255, 0, 0), opacity: floa
 
 def apply_color_effect(base_img: Image.Image, color: tuple) -> Image.Image:
     """
-    模拟图层混合模式 'Color': 
-    使用 base_img 的亮度 (Luminance/Value)
-    使用 color 的色相 (Hue) 和饱和度 (Saturation)
+    Simulate layer blending mode 'Color': 
+    Use Luminance/Value of base_img
+    Use Hue and Saturation of color
     """
-    # 确保 base_img 是 RGB 模式以便转换
+    # Ensure base_img is in RGB mode for conversion
     if base_img.mode != 'RGB':
         base_img = base_img.convert('RGB')
         
-    # 1. 转换 base 到 HSV 获取 V
+    # 1. Convert base to HSV to get V
     base_hsv = base_img.convert('HSV')
     base_np = np.array(base_hsv)
     v_channel = base_np[:, :, 2]
     
-    # 2. 创建纯色图片并转 HSV 获取 H, S
+    # 2. Create solid color image and convert to HSV to get H, S
     color_layer = Image.new('RGB', base_img.size, color)
     color_hsv = color_layer.convert('HSV')
     color_np = np.array(color_hsv)
@@ -88,7 +88,7 @@ def apply_color_effect(base_img: Image.Image, color: tuple) -> Image.Image:
     h_channel = color_np[:, :, 0]
     s_channel = color_np[:, :, 1]
     
-    # 3. 组合新的 HSV 图片
+    # 3. Combine new HSV image
     new_hsv_np = np.dstack((h_channel, s_channel, v_channel))
     new_hsv_img = Image.fromarray(new_hsv_np, 'HSV')
     
@@ -97,35 +97,35 @@ def apply_color_effect(base_img: Image.Image, color: tuple) -> Image.Image:
 
 def process_image_for_papercut(image_path: str) -> str:
     """
-    完整的剪纸图像处理流程
+    Complete papercut image processing pipeline
     
     Args:
-        image_path: 原始图片路径
+        image_path: Original image path
         
     Returns:
-        str: 处理后的图片路径
+        str: Processed image path
     """
     try:
-        # 加载图片
+        # Load image
         image = Image.open(image_path)
         
-        # 步骤1: 去饱和
+        # Step 1: Desaturate
         image = desaturate_image(image)
         
-        # 步骤2: 增强对比度 (factor=3.0)
+        # Step 2: Increase contrast (factor=3.0)
         image = increase_contrast(image, factor=3.0)
         
-        # 步骤3: 抠除白色背景 (threshold=230)
+        # Step 3: Remove white background (threshold=230)
         image = remove_white_background(image, threshold=230)
         
-        # 步骤4: 转换为红色
+        # Step 4: Convert to red
         image = convert_to_red(image)
         
-        # 确定输出路径
+        # Determine output path
         base_dir = os.path.dirname(os.path.abspath(__file__))
         output_dir = os.path.join(base_dir, "image_processed")
         if not os.path.exists(output_dir):
-            # 尝试在当前目录下找 image_processed
+            # Try to find output in current directory
             output_dir = os.path.join(os.getcwd(), "image_processed")
             os.makedirs(output_dir, exist_ok=True)
             
@@ -143,13 +143,13 @@ def process_image_for_papercut(image_path: str) -> str:
 
 def render_on_window(papercut_input, scene_input, output_path=None) -> Image.Image:
     """
-    渲染到窗户场景
+    Render to window scene
     Args:
-        papercut_input: 剪纸图片路径 (str) 或 PIL.Image 对象
-        scene_input: 场景图片路径 (str) 或 PIL.Image 对象
-        output_path: (可选) 输出路径，如果提供则保存
+        papercut_input: Papercut image path (str) or PIL.Image object
+        scene_input: Scene image path (str) or PIL.Image object
+        output_path: (Optional) Output path, save if provided
     Returns:
-        PIL.Image: 合成后的图片
+        PIL.Image: Composited image
     """
     try:
         # Load Papercut
@@ -164,10 +164,10 @@ def render_on_window(papercut_input, scene_input, output_path=None) -> Image.Ima
         else:
             scene = scene_input.convert('RGB')
         
-        # 准备剪纸图片用于窗户场景合成
-        # 1. 调整尺寸为 1736x1736 (Base_Window.jpg 5760x3840)
+        # Prepare papercut image for window scene composition
+        # 1. Resize to 1736x1736 (Base_Window.jpg 5760x3840)
         papercut = papercut.resize((1736, 1736), Image.Resampling.LANCZOS)
-        # 2. 应用特定颜色 (#980015) 和透明度 (75%)
+        # 2. Apply specific color (#980015) and opacity (75%)
         processed_papercut = convert_to_red(papercut, color=(152, 0, 21), opacity=0.75)
         
         # Window coordinates
@@ -189,7 +189,7 @@ def render_on_window(papercut_input, scene_input, output_path=None) -> Image.Ima
 
 def render_on_wall(papercut_input, scene_input, output_path=None) -> Image.Image:
     """
-    渲染到墙壁场景
+    Render to wall scene
     """
     try:
         # Load Papercut
@@ -205,7 +205,7 @@ def render_on_wall(papercut_input, scene_input, output_path=None) -> Image.Image
             scene = scene_input.convert('RGB')
             
         # Base_wall.jpeg (768x768)
-        # 剪纸图片缩放至背景高度的49.48%
+        # Scale papercut image to 49.48% of background height
         target_height = int(scene.height * 0.4948)
         aspect_ratio = papercut.width / papercut.height
         target_width = int(target_height * aspect_ratio)
@@ -213,7 +213,7 @@ def render_on_wall(papercut_input, scene_input, output_path=None) -> Image.Image
         papercut = papercut.resize((target_width, target_height), Image.Resampling.LANCZOS)
         processed_papercut = convert_to_red(papercut, color=(152, 0, 21), opacity=0.9) 
         
-        # 图片中心点在 高37.3%，宽66.67%
+        # Image center point at Height 37.3%, Width 66.67%
         center_x = int(scene.width * 0.6667)
         center_y = int(scene.height * 0.373)
         
@@ -236,7 +236,7 @@ def render_on_wall(papercut_input, scene_input, output_path=None) -> Image.Image
 
 def render_on_door(papercut_input, scene_input, output_path=None) -> Image.Image:
     """
-    渲染到门场景
+    Render to door scene
     """
     try:
         # Load Papercut
@@ -252,7 +252,7 @@ def render_on_door(papercut_input, scene_input, output_path=None) -> Image.Image
             scene = scene_input.convert('RGB')
             
         # Base_door.jpg (799x799)
-        # 剪纸图片缩放至背景高度的18%
+        # Scale papercut image to 18% of background height
         target_height = int(scene.height * 0.18)
         aspect_ratio = papercut.width / papercut.height
         target_width = int(target_height * aspect_ratio)
@@ -260,7 +260,7 @@ def render_on_door(papercut_input, scene_input, output_path=None) -> Image.Image
         papercut = papercut.resize((target_width, target_height), Image.Resampling.LANCZOS)
         processed_papercut = convert_to_red(papercut, color=(152, 0, 21), opacity=0.9)
         
-        # 图片中心点在 高36.3%，宽62.45%
+        # Image center point at Height 36.3%, Width 62.45%
         center_x = int(scene.width * 0.6245)
         center_y = int(scene.height * 0.363)
         
@@ -283,7 +283,7 @@ def render_on_door(papercut_input, scene_input, output_path=None) -> Image.Image
 
 def render_on_package(papercut_input, scene_input, output_path=None) -> Image.Image:
     """
-    渲染到包装场景
+    Render to package scene
     """
     try:
         # Load Papercut
@@ -299,23 +299,23 @@ def render_on_package(papercut_input, scene_input, output_path=None) -> Image.Im
             scene = scene_input.convert('RGB')
             
         # Base_package.jpg (4032x2688)
-        # 剪纸图片大小缩放至背景图片的25%左右 (宽)
+        # Scale papercut image size to about 25% of background image (width)
         target_width = int(scene.width * 0.25)
         aspect_ratio = papercut.height / papercut.width
         target_height = int(target_width * aspect_ratio)
         
         papercut = papercut.resize((target_width, target_height), Image.Resampling.LANCZOS)
-        # 模拟印刷质感：稍微降低不透明度
+        # Simulate printing texture: slightly reduce opacity
         processed_papercut = convert_to_red(papercut, color=(152, 0, 21), opacity=0.85)
         
-        # 旋转 33度 (逆时针)
+        # Rotate 33 degrees (counter-clockwise)
         processed_papercut = processed_papercut.rotate(33, expand=True, resample=Image.Resampling.BICUBIC)
         
-        # 图片中心点位置在 高48.33%，宽48%
+        # Image center point position at Height 48.33%, Width 48%
         center_x = int(scene.width * 0.48)
         center_y = int(scene.height * 0.4833)
         
-        # 旋转后尺寸会变，需重新获取尺寸
+        # Size changes after rotation, need to re-acquire size
         new_width, new_height = processed_papercut.size
         
         x = center_x - new_width // 2
@@ -336,38 +336,38 @@ def render_on_package(papercut_input, scene_input, output_path=None) -> Image.Im
 
 
 def main():
-    # 读取图片
+    # Read image
     input_path = 'examples/input/d411ec41e95fa45c38c5ab852495a5b1.png'
     output_path = 'examples/output/d411ec41e95fa45c38c5ab852495a5b1.png'
     
-    print("📂 正在处理图片...")
+    print("📂 Processing image...")
     image = Image.open(input_path)
-    print(f"✅ 图片已加载: {image.size[0]}x{image.size[1]}")
+    print(f"✅ Image loaded: {image.size[0]}x{image.size[1]}")
     
-    # 步骤1: 饱和度设为0
-    print("🎨 步骤1: 饱和度设为0...")
+    # Step 1: Setting saturation to 0
+    print("🎨 Step 1: Setting saturation to 0...")
     image = desaturate_image(image)
     
-    # 步骤2: 对比度拉满
-    print("🎨 步骤2: 对比度拉满...")
+    # Step 2: Maximizing contrast
+    print("🎨 Step 2: Maximizing contrast...")
     image = increase_contrast(image, factor=10.0)
     
-    # 步骤3: 抠除白色
-    print("✂️  步骤3: 抠除白色背景...")
+    # Step 3: Removing white background
+    print("✂️  Step 3: Removing white background...")
     image = remove_white_background(image, threshold=200)
     
-    # 步骤4: 转为红色
-    print("🔴 步骤4: 转换为红色...")
+    # Step 4: Converting to red
+    print("🔴 Step 4: Converting to red...")
     image = convert_to_red(image)
     
-    # 创建输出目录（如果不存在）
+    # Create output directory (if not exists)
     output_dir = os.path.dirname(output_path)
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
-    # 保存结果
+    # Save result
     image.save(output_path, 'PNG')
-    print(f"✅ 处理完成！输出位置: {output_path}")
+    print(f"✅ Processing complete! Output location: {output_path}")
 
 
 if __name__ == "__main__":
