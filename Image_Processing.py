@@ -122,11 +122,11 @@ def process_image_for_papercut(image_path: str) -> str:
         image = convert_to_red(image)
         
         # 确定输出路径
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        output_dir = os.path.join(base_dir, "output")
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        output_dir = os.path.join(base_dir, "image_processed")
         if not os.path.exists(output_dir):
-            # 尝试在当前目录下找 output
-            output_dir = os.path.join(os.getcwd(), "output")
+            # 尝试在当前目录下找 image_processed
+            output_dir = os.path.join(os.getcwd(), "image_processed")
             os.makedirs(output_dir, exist_ok=True)
             
         timestamp = int(time.time())
