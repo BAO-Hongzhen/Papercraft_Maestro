@@ -2,9 +2,9 @@
 
 [English](README.md) | [中文](README_zh.md)
 
-[](https://www.python.org/downloads/)
-[](https://streamlit.io/)
-[](https://github.com/comfyanonymous/ComfyUI)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.38.0-FF4B4B)](https://streamlit.io/)
+[![ComfyUI](https://img.shields.io/badge/ComfyUI-Backend-4285F4)](https://github.com/comfyanonymous/ComfyUI)
 
 **Papercraft Maestro** is an AI-powered platform for generating traditional Chinese paper cutting art. Built with **Streamlit** for an interactive frontend, it combines the **Flux image generation model** with traditional image processing algorithms to instantly transform simple creative descriptions into exquisite red paper cut patterns, offering various scene simulations for preview.
 
@@ -24,7 +24,11 @@ This project is a result of the **SD5913 Group Project**.
   * **Auto-Connect**:
       * **Zero Configuration**: Whether you are using **ComfyUI Standard (Web)**, **ComfyUI Desktop**, or **ComfyUI Portable**, the system automatically identifies and connects.
       * **Smart Scanning**: Automatically scans common ports in the local environment (e.g., 8188, 8000, 8189, 3000, etc.), eliminating the need for manual configuration files.
-  * **Smart Prompt System**: **No need to learn complex Prompts!** We have built-in carefully tuned stylized prompts. Users only need to input the **subject** they want to generate (e.g., "a rabbit" or "a dragon"), and the system automatically adds style descriptions like "traditional Chinese paper cut", "red paper", "complex patterns", etc.
+  * **Smart Prompt System**: **No need to learn complex Prompts!** We have built-in carefully tuned stylized prompts. Users only need to input the **subject** they want to generate (e.g., "a rabbit" or "a dragon"), and the system automatically fills it into the preset style template:
+    * **Prefix**: "A vibrant red Chinese paper"
+    * **User Input**: [Subject]
+    * **Suffix**: "complex Chinese patterns, stand proudly among the swirling clouds and stylized clouds. The background is pure white, emphasizing a bold traditional design"
+    By automatically concatenating these, the system ensures that every generated image maintains a unified and authentic traditional Chinese paper cut style.
   * **Automatic Craft Processing**: Built-in image processing pipeline (desaturation, high contrast enhancement, smart background removal, Chinese red coloring) to simulate the visual effect of real paper cuts.
   * **Scene Simulation (Mockup)**: Supports one-click synthesis of generated paper cuts into real scenes like windows, walls, and door decorations to preview the actual decorative effect.
   * **Easy Download**: Supports downloading high-definition original paper cut images and scene synthesis images.
@@ -42,7 +46,7 @@ This module uses **Pillow (PIL)** and **NumPy** to perform a series of computer 
   * **Vectorized Coloring**: Implements the `convert_to_red` function to map non-transparent pixels to standard "Chinese Red" color values while preserving original transparency levels for natural edge transitions.
   * **Scene Synthesis**: Uses **Lanczos resampling** algorithm to high-quality scale paper cut images and accurately fit them onto background images like windows, walls, or doors based on a preset coordinate system.
 
-### 2. ComfyUI Automation Interface (ComfyUI_api.py)
+### 2. ComfyUI Automation Interface (comfy_api.py)
 
 This module encapsulates communication logic with the ComfyUI backend, achieving a zero-configuration connection experience:
 
