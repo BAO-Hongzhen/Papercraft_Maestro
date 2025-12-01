@@ -294,7 +294,7 @@ def main():
     """, unsafe_allow_html=True)
 
     # Input Section
-    prompt = st.text_area("✍️ Enter your creative description", height=100, placeholder="e.g., tiger, flower, superman or a sentence...", label_visibility="collapsed")
+    prompt = st.text_area("Enter your creative description", height=100, placeholder="e.g., tiger, flower, superman or a sentence...", label_visibility="collapsed")
     
     # Generate Button (Centered)
     # Use a narrower middle column for better visual centering
@@ -309,7 +309,7 @@ def main():
 
     if generate_btn:
         if not prompt:
-            st.warning("⚠️ Please enter a description first!")
+            st.warning("Please enter a description first!")
         else:
             # Clear previous results immediately
             st.session_state.processed_image = None
@@ -322,7 +322,7 @@ def main():
             
             try:
                 # Initialize Generator (Updated to use ComfyUIManager)
-                status_container.info("🔌 Connecting to ComfyUI service...")
+                status_container.info("Connecting to ComfyUI service...")
                 progress_bar.progress(10)
                 
                 try:
@@ -334,10 +334,10 @@ def main():
                     connection_ok = False
                 
                 if not connection_ok:
-                    status_container.error("❌ Cannot connect to ComfyUI. Please ensure the service is running (127.0.0.1:8188)")
+                    status_container.error("Cannot connect to ComfyUI. Please ensure the service is running (127.0.0.1:8188)")
                 else:
                     # Generate (Using default parameters)
-                    status_container.info("🎨 Generating papercut pattern (this may take a few seconds)...")
+                    status_container.info("Generating papercut pattern (this may take a few seconds)...")
                     progress_bar.progress(30)
                     
                     # Generate image using manager
@@ -345,7 +345,7 @@ def main():
                     
                     if raw_image_path:
                         progress_bar.progress(70)
-                        status_container.info("✂️ Processing papercut (removing background, coloring)...")
+                        status_container.info("Processing papercut (removing background, coloring)...")
                         
                         # Process
                         img = Image.open(raw_image_path)
@@ -366,7 +366,7 @@ def main():
                         img.save(processed_path)
                         
                         # Generate Scene Previews
-                        status_container.info("🏠 Generating scene previews...")
+                        status_container.info("Generating scene previews...")
                         
                         # Use ui_assets/prototype_images for scene backgrounds
                         ui_assets_dir = os.path.join(BASE_DIR, 'ui_assets', 'prototype_images')
@@ -396,7 +396,7 @@ def main():
                             st.session_state.scene_previews['wall'] = render_on_wall(img, wall_bg, output_path)
                         
                         progress_bar.progress(100)
-                        status_container.success("✅ Creation complete!")
+                        status_container.success("Creation complete!")
                         time.sleep(1)
                         status_container.empty()
                         progress_bar.empty()
@@ -405,10 +405,10 @@ def main():
                         st.rerun()
                         
                     else:
-                        status_container.error(f"❌ Generation failed: ComfyUI did not return an image")
+                        status_container.error(f"Generation failed: ComfyUI did not return an image")
             
             except Exception as e:
-                status_container.error(f"❌ Error occurred: {e}")
+                status_container.error(f"Error occurred: {e}")
 
     # Results Display
     if st.session_state.processed_image:
@@ -471,7 +471,7 @@ def main():
                     else:
                         st.info("Wall preview failed")
             else:
-                st.warning("⚠️ Preview generation failed. Please check resource files.")
+                st.warning("Preview generation failed. Please check resource files.")
 
 if __name__ == "__main__":
     main()

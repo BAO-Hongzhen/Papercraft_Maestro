@@ -18,12 +18,12 @@ def find_comfyui_address():
     Automatically detect ComfyUI address
     Supports ComfyUI Desktop, command line version, and custom port configuration
     """
-    print("🔍 Searching for ComfyUI service...")
+    print("Searching for ComfyUI service...")
     
     # 1. Prioritize checking environment variables
     env_addr = os.environ.get("COMFYUI_ADDRESS")
     if env_addr:
-        print(f"✅ Found address from environment variable: {env_addr}")
+        print(f"Found address from environment variable: {env_addr}")
         return env_addr
 
     # 2. Define list of ports to scan (sorted by priority)
@@ -39,11 +39,11 @@ def find_comfyui_address():
     for port in all_ports:
         if _check_comfyui_port(port):
             url = f"http://127.0.0.1:{port}"
-            print(f"✅ Found ComfyUI service at: {url}")
+            print(f"Found ComfyUI service at: {url}")
             return url
             
-    print("⚠️ No running ComfyUI found, using default address http://127.0.0.1:8188/")
-    print("💡 Tip: Please ensure ComfyUI or ComfyUI Desktop is started")
+    print("No running ComfyUI found, using default address http://127.0.0.1:8188/")
+    print("Tip: Please ensure ComfyUI or ComfyUI Desktop is started")
     return "http://127.0.0.1:8188/"
 
 
@@ -82,7 +82,7 @@ class ComfyUIManager:
             self.server_address = server_address
             
         self.workflow_path = workflow_path
-        print(f"🔌 Connecting to ComfyUI: {self.server_address}")
+        print(f"Connecting to ComfyUI: {self.server_address}")
         self.api = ComfyApiWrapper(self.server_address)
         
     def generate_image(self, prompt, output_dir):

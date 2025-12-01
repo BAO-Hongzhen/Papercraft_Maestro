@@ -340,24 +340,24 @@ def main():
     input_path = 'examples/input/d411ec41e95fa45c38c5ab852495a5b1.png'
     output_path = 'examples/output/d411ec41e95fa45c38c5ab852495a5b1.png'
     
-    print("📂 Processing image...")
+    print("Processing image...")
     image = Image.open(input_path)
-    print(f"✅ Image loaded: {image.size[0]}x{image.size[1]}")
+    print(f"Image loaded: {image.size[0]}x{image.size[1]}")
     
     # Step 1: Setting saturation to 0
-    print("🎨 Step 1: Setting saturation to 0...")
+    print("Step 1: Setting saturation to 0...")
     image = desaturate_image(image)
     
     # Step 2: Maximizing contrast
-    print("🎨 Step 2: Maximizing contrast...")
+    print("Step 2: Maximizing contrast...")
     image = increase_contrast(image, factor=10.0)
     
     # Step 3: Removing white background
-    print("✂️  Step 3: Removing white background...")
+    print("Step 3: Removing white background...")
     image = remove_white_background(image, threshold=200)
     
     # Step 4: Converting to red
-    print("🔴 Step 4: Converting to red...")
+    print("Step 4: Converting to red...")
     image = convert_to_red(image)
     
     # Create output directory (if not exists)
@@ -367,7 +367,7 @@ def main():
     
     # Save result
     image.save(output_path, 'PNG')
-    print(f"✅ Processing complete! Output location: {output_path}")
+    print(f"Processing complete! Output location: {output_path}")
 
 
 if __name__ == "__main__":
